@@ -147,3 +147,58 @@ Each entry: what, why, alternatives considered, trade-offs. Added as decisions a
 - **What:** `tests/conftest.py::Scripted` is a `BaseChatModel` that returns pre-written messages in order and records every prompt. Router decisions are scripted as tool calls, which LangChain's default `with_structured_output` parses.
 - **Why:** graph logic (routing, loop bounds, retries, refusals, interrupts, memory) must be tested deterministically and offline. Recording prompts lets tests assert what the model *saw*, e.g. that injected text never reached the composer.
 - **Trade-offs:** these tests prove the wiring, not answer quality. Quality is the eval's job (M4).
+
+## D23. Placeholder documents, clearly marked
+
+- **What:** `data/docs` ships six small HTML documents (cashback, credit limit and grace period, black-card tariffs, currency accounts, jars, an English FAQ). Each says "Зразок для демонстрації. Не є офіційними умовами monobank" and has `<meta name="sample" content="true">`, which travels into every chunk's metadata.
+- **Why:** the RAG pipeline and its eval need a fixed corpus now; the real PDFs/HTML get added later. Tariff numbers in these files are illustrative, and the marking makes sure no one mistakes them for real terms. The English FAQ plants an injection sentence to test document-side sanitization.
+- **Trade-offs:** knowledge-question eval answers are tied to this corpus; when real documents replace it, the knowledge part of the eval dataset must be updated too.
+
+## D24. Loaders keep the heading path; injections are dropped at load time
+
+- **What:** HTML is parsed with BeautifulSoup: a heading stack (`h1`–`h4`) gives every paragraph, list item and table row its section path; table rows become `cell | cell` lines. PDFs use pypdf; numbered lines ("2.1 …") and short ALL-CAPS lines are treated as headings. Sentences that look like instructions to an AI are removed when the document is loaded, keeping the rest of the paragraph.
+- **Why:** the section path is what structure-aware chunking and citations need. Removing injected sentences at ingestion follows the same rule as card masking (D10): clean once at the entrance, so nothing downstream has to remember.
+- **Limits:** PDF heading detection is heuristic; scanned PDFs (images) would need OCR, which isn't included.
+
+## D25. Two chunking strategies, compared rather than assumed
+
+- **What:** *fixed*: a 600-character sliding window with 100 overlap over the whole document, cut at word boundaries (15 chunks for this corpus). *structure*: one chunk per section, long sections split at paragraph then sentence boundaries up to 1000 chars, and the embedded text prefixed with `Title > Section` (38 chunks).
+- **Why:** fixed-size is the standard baseline. Tariff documents are made of short, self-contained sections ("Мінімальний платіж", "Коли пільговий період не діє"); a chunk that matches a section answers one question and cites cleanly. The header prefix lets a short chunk like "5% від суми заборгованості…" still match "minimum payment".
+- **Trade-offs:** structure-aware chunks can be tiny (the title/banner chunk), and the comparison changes two things at once (boundaries and header). That is what "structure-aware" means in practice. The M4 ablation measures recall@k and MRR for both.
+
+## D26. Embeddings: bge-m3 locally, an API model as the alternative
+
+- **What:** `EMBEDDINGS=local:BAAI/bge-m3` (sentence-transformers, on Apple MPS here). Any other value (`google_genai:gemini-embedding-001`, `openai:text-embedding-3-small`) goes through LangChain's `init_embeddings` and needs that provider's package and key. Models load from the local Hugging Face cache by path, so startup makes no network calls.
+- **Why bge-m3:** trained on 100+ languages with strong Ukrainian results, up to 8k-token inputs, no query/passage prefixes to get wrong, free and private (documents never leave the machine). Observed: an English question ("How does the credit limit grace period work?") retrieves the right Ukrainian chunk; BM25 returns nothing for it.
+- **Alternatives:** multilingual-e5-large (good, but needs `query:`/`passage:` prefixes and has a 512-token limit), OpenAI or Gemini embeddings (no local compute, but cost per call and data leaves the machine), Ollama-served bge-m3 (avoids PyTorch, but the reranker needs PyTorch anyway).
+- **Trade-offs:** about 2.3 GB of weights and PyTorch in the install. The API option is wired but not installed until there's a key to compare with.
+
+## D27. Qdrant, one collection per (chunking, embedding model)
+
+- **What:** Qdrant v1.20 in Docker Compose (client and server versions match). Collections are named `mono_docs_<strategy>_<embedding>`; `mono-agent index` rebuilds both strategies from `data/docs`. Tests use Qdrant's in-memory mode (`QdrantClient(":memory:")`), so CI needs no Docker.
+- **Why:** a real vector database with payloads (chunk text and metadata come back with every hit), filtering, and a server process, like production. Separate collections per configuration let the ablation switch with one setting, and vectors from different models never mix.
+- **Alternatives:** Chroma or FAISS (lighter, but weaker as a "production" story), pgvector (great if Postgres is already there; it isn't).
+- **Trade-offs:** rebuilding the whole collection on every index is fine for tens of chunks; for thousands, upsert by content hash instead.
+
+## D28. BM25 written in ~40 lines, with prefix stemming for Ukrainian
+
+- **What:** Okapi BM25 (k1 = 1.5, b = 0.75) in Python over the same chunks Qdrant holds (scrolled at startup: one source of truth). Tokens are lowercased words with stopwords removed and truncated to 6 characters, a crude stemmer.
+- **Why:** Ukrainian is highly inflected (кешбек, кешбеку, кешбеком) and has no Snowball stemmer, so the standard BM25 tokenizers (Qdrant/fastembed use Snowball) miss most matches. Prefix truncation is a known cheap approximation, and it's easy to explain. At this corpus size, scoring every chunk takes microseconds.
+- **Alternatives:** Qdrant sparse vectors with server-side fusion (the way to go at scale), `rank_bm25` (a dependency for the same math), a morphological analyser like pymorphy3 (better stems, another dependency).
+- **Trade-offs:** in-memory BM25 doesn't scale to millions of chunks, and prefix truncation sometimes merges unrelated words. Both are marked as shortcuts in code.
+
+## D29. Hybrid = RRF of dense + BM25, then a cross-encoder reranker; each stage switchable
+
+- **What:** `search(query, mode="dense"|"bm25"|"hybrid", rerank=True|False)`. Hybrid takes the top 20 of each and fuses them with reciprocal rank fusion (`Σ 1/(60 + rank)`); the reranker (`BAAI/bge-reranker-v2-m3`) rescores those candidates and the top 5 go to the composer.
+- **Why:** dense handles meaning and language switches; BM25 handles exact terms (numbers, "MCC", product names). RRF uses only ranks, so there's no need to calibrate cosine against BM25 scores, and k = 60 is the standard value from the original paper. A cross-encoder reads query and chunk together, so it's much more precise than either retriever, but too slow to run on the whole corpus; 20 candidates keeps it cheap. Observed: for "is cashback paid on EUR account purchases?" only the reranked pipeline puts `currency-accounts#4` first.
+- **Trade-offs:** the reranker adds a second 2.3 GB model and about 100–300 ms per query. The ablation shows whether it pays off.
+
+## D30. Knowledge node: standalone-query rewrite only for follow-ups; citations are verified
+
+- **What:** the first message is searched as is; a follow-up ("а для готівки?") is first rewritten into a standalone query by the router model. The composer must cite chunk ids like `[credit-limit#2]`; citations are parsed from the answer and kept only if that chunk was actually retrieved. If Qdrant is down or the index missing, the knowledge step returns no documents and the answer says so; transaction questions still work.
+- **Why:** follow-ups are meaningless as search queries on their own, but rewriting every message would cost a model call for nothing. Verifying citations stops made-up references (a test feeds `[made-up#7]` and checks it's dropped).
+
+## D31. Tools return errors the model can act on
+
+- **What:** a period with no transactions at all returns an error naming the cached date range and today's date. `aggregate_spending` rejects non-spending categories with a hint to use `query_transactions`, and reports cashback earned per group.
+- **Why:** seen live: asked about "October", the model queried October 2024 (the data is 2025), got zeros, and the composer said "you received 0 грн cashback". A silent zero is worse than an error: an error message is feedback the model can use, and it did (it retried with 2025). Prompt instructions alone didn't prevent it.
