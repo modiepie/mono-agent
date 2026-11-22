@@ -6,7 +6,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from mono_agent.tools.categories import Category
+from mono_agent.tools.categories import NON_SPENDING, Category
 
 Currency = Literal["UAH", "USD", "EUR"]
 
@@ -51,6 +51,16 @@ class AggregateInput(Period):
     currency: Currency = "UAH"
     category: Category | None = Field(default=None, description="Only this category")
     top_n: int = Field(default=15, ge=1, le=50)
+
+    @model_validator(mode="after")
+    def _spending_category(self) -> Self:
+        if self.category in NON_SPENDING:
+            raise ValueError(
+                f"{self.category} is not spending; use query_transactions with "
+                f"category={self.category} (cashback earned per purchase is in the "
+                "'cashback' field of aggregate_spending results)"
+            )
+        return self
 
 
 class CompareInput(BaseModel):
@@ -112,11 +122,13 @@ class Group(BaseModel):
     total: float  # spending is positive
     count: int
     average: float
+    cashback: float = 0  # cashback earned on these purchases
 
 
 class AggregateResult(BaseModel):
     currency: Currency
     total_spent: float
+    total_cashback: float
     groups: list[Group]
 
 

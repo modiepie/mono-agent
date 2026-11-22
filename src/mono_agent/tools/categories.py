@@ -4,11 +4,33 @@ from typing import Literal, get_args
 
 # Single source of truth for category names: tool schemas use this Literal as an enum.
 Category = Literal[
-    "groceries", "restaurants", "taxi", "fuel", "car", "health", "transport", "travel",
-    "delivery", "electronics", "home", "clothing", "entertainment", "digital", "telecom",
-    "utilities", "sport", "beauty", "pets", "cash", "shopping", "other",
-    "transfers", "jars", "currency_exchange", "cashback",
-]  # fmt: skip
+    "groceries",
+    "restaurants",
+    "taxi",
+    "fuel",
+    "car",
+    "health",
+    "transport",
+    "travel",
+    "delivery",
+    "electronics",
+    "home",
+    "clothing",
+    "entertainment",
+    "digital",
+    "telecom",
+    "utilities",
+    "sport",
+    "beauty",
+    "pets",
+    "cash",
+    "shopping",
+    "other",
+    "transfers",
+    "jars",
+    "currency_exchange",
+    "cashback",
+]
 CATEGORIES: tuple[str, ...] = get_args(Category)
 
 _MCC: dict[Category, tuple[int, ...]] = {

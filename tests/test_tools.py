@@ -143,3 +143,26 @@ def test_every_tool_schema_is_valid_json_schema():
         schema = spec.schema()
         assert schema["function"]["name"] == spec.name
         assert "$ref" not in str(schema)  # refs inlined: small local models handle them poorly
+
+
+def test_aggregate_reports_cashback_and_rejects_non_spending_category(ctx):
+    out, ok = run_tool(ctx, "aggregate_spending", {**OCT, "group_by": "category", "top_n": 50})
+    taxi = next(g for g in out["groups"] if g["key"] == "taxi")
+    expected = sum(i.cashback_amount for i in MAIN if in_month(i, 10) and i.mcc == 4121) / 100
+    assert taxi["cashback"] == round(expected, 2) > 0
+    assert out["total_cashback"] >= taxi["cashback"]
+    out, ok = run_tool(
+        ctx, "aggregate_spending", {**OCT, "group_by": "month", "category": "cashback"}
+    )
+    assert not ok and "query_transactions" in str(out)
+
+
+def test_empty_period_is_an_error_that_names_available_data(ctx):
+    run_tool(ctx, "aggregate_spending", {**OCT, "group_by": "category"})  # cache October 2025
+    out, ok = run_tool(
+        ctx,
+        "aggregate_spending",
+        {"date_from": "2024-10-01", "date_to": "2024-10-31", "group_by": "category"},
+    )
+    assert not ok
+    assert "2025-10-01" in out["error"] and "check the year" in out["error"]

@@ -99,6 +99,23 @@ class ToolContext:
         account = self.account(currency)
         start, end = _bounds(p)
         self.cache.sync_statement(self.client, account, start, end, now=time.time())
+        # A whole period without a single transaction almost always means a wrong period
+        # (e.g. the model picked the wrong year). Say so instead of returning a silent zero.
+        db = self.cache.db
+        if not db.execute(
+            "SELECT 1 FROM transactions WHERE account_id = ? AND time BETWEEN ? AND ? LIMIT 1",
+            (account, start, end),
+        ).fetchone():
+            first, last = db.execute(
+                "SELECT MIN(time), MAX(time) FROM transactions WHERE account_id = ?", (account,)
+            ).fetchone()
+            available = (
+                f"{_period_key(first, 'day')}..{_period_key(last, 'day')}" if first else "none"
+            )
+            raise ValueError(
+                f"no {currency} transactions at all between {p.date_from} and {p.date_to}; "
+                f"cached data covers {available}. Today is {self.today}: check the year."
+            )
         return account, start, end
 
 
@@ -192,7 +209,8 @@ def aggregate_spending(ctx: ToolContext, args: AggregateInput) -> AggregateResul
     clauses, params = _where(args, account, start, end)
     key = _group_expr(args.group_by)
     rows = ctx.cache.db.execute(
-        f"SELECT {key} AS k, -SUM(amount) AS total, COUNT(*) AS n FROM transactions "
+        f"SELECT {key} AS k, -SUM(amount) AS total, COUNT(*) AS n, "
+        f"SUM(cashback_amount) AS cashback FROM transactions "
         f"WHERE {' AND '.join(clauses)} GROUP BY k",
         params,
     ).fetchall()
@@ -204,6 +222,7 @@ def aggregate_spending(ctx: ToolContext, args: AggregateInput) -> AggregateResul
                 total=_money(r["total"]),
                 count=r["n"],
                 average=_money(r["total"] / r["n"]),
+                cashback=_money(r["cashback"]),
             )
             for r in rows
         ),
@@ -212,6 +231,7 @@ def aggregate_spending(ctx: ToolContext, args: AggregateInput) -> AggregateResul
     return AggregateResult(
         currency=args.currency,
         total_spent=_money(sum(r["total"] for r in rows)),
+        total_cashback=_money(sum(r["cashback"] for r in rows)),
         groups=groups[: args.top_n],
     )
 
