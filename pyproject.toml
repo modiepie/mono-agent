@@ -28,6 +28,8 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+# Ukrainian text is intentional: Cyrillic letters that look like Latin ones are not typos.
+ignore = ["RUF001", "RUF002", "RUF003"]
 
 [tool.pyright]
 include = ["src", "tests", "eval"]
