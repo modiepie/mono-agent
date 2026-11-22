@@ -33,6 +33,13 @@ def looks_like_injection(text: str | None) -> bool:
     return bool(text and _INJECTION.search(text))
 
 
+def strip_injection_sentences(text: str) -> tuple[str, bool]:
+    """Drop only the offending sentences: documents keep their useful content."""
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    kept = [s for s in sentences if not looks_like_injection(s)]
+    return " ".join(kept), len(kept) != len(sentences)
+
+
 def sanitize(text: str | None) -> tuple[str | None, bool]:
     """Return (safe text, was_suspicious). Data with instructions in it never reaches a prompt."""
     if looks_like_injection(text):
