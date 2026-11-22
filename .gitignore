@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+# Local caches and any real bank data stay out of git.
+data/*.sqlite
+data/real/
+*.sqlite-journal

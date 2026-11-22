@@ -1,0 +1,38 @@
+[project]
+name = "mono-agent"
+version = "0.1.0"
+description = "LangGraph multi-agent personal-finance assistant over the monobank Personal API"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+# Dependencies are added per milestone, only when code uses them.
+dependencies = [
+    "httpx>=0.28",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.390",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.pyright]
+include = ["src", "tests", "eval"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
