@@ -82,3 +82,68 @@ Each entry: what, why, alternatives considered, trade-offs. Added as decisions a
 
 - **What:** ruff's "ambiguous Unicode character" rules are disabled.
 - **Why:** they flag Cyrillic letters that look like Latin ones (`С`, `О`, `а`). In a Ukrainian project those are intentional, and the rule would fire on every merchant name.
+
+## D13. What "spending" means, and categories as a SQLite function
+
+- **What:** MCC codes map to ~25 categories in `tools/categories.py`. Transfers (MCC 4829) are split by description into `transfers`, `jars`, `currency_exchange`, `cashback`. *Spending* = `-SUM(amount)` over everything except those four, so refunds automatically reduce spending. The mapping is registered with `sqlite3.create_function`, so SQL can `WHERE` and `GROUP BY` on it.
+- **Why:** "how much did I spend" must not count rent paid to a person, money moved to a jar or buying dollars as consumption; and a refunded purchase shouldn't count twice. One Python function is the single definition used by SQL, tools and tests.
+- **Alternatives:** a `category` column filled at ingestion (needs a migration when the mapping changes), a SQL `CASE` (duplicates the mapping), an LLM categorizer (non-deterministic; it's the QLoRA stretch goal instead).
+- **Trade-offs:** rent paid by card transfer counts as a transfer, not as housing spending. That's defensible, and I would say so in the answer.
+
+## D14. Parametrized query builder, never LLM-written SQL
+
+- **What:** tools accept Pydantic models with enums (`Literal`) for categories, group-by fields and sort orders; SQL is assembled from fixed fragments with `?` parameters. `LIKE` wildcards in merchant search are escaped. The three aggregation tools from the spec are one `aggregate_spending(group_by=...)`.
+- **Why:** text-to-SQL is an injection and correctness risk on financial data. An enum the model can't escape is a hard guarantee; a test sends `%' OR 1=1 --` and gets zero rows. One aggregate tool with `group_by` gives the model fewer, clearer choices than three near-identical tools.
+- **Alternatives:** LangChain SQL agent (flexible, but unbounded queries and hard to evaluate), separate tools per grouping.
+- **Trade-offs:** questions outside the tool set ("median purchase on weekends") can't be answered. That's acceptable: the eval tells which tools are missing.
+
+## D15. Tool registry; validation errors go back to the model
+
+- **What:** `TOOLS` maps a name to (description, input model, function). `run_tool` validates with Pydantic and returns `(output, ok)`. An invalid call becomes an error `ToolMessage`, not an exception.
+- **Why:** small models produce a malformed call now and then. Seen live: Qwen sent `period_b` as a broken string, received the validation error, and corrected itself on the next step. Tool schemas are generated from the same Pydantic models (refs inlined), so the schema the model sees and the validator can't drift apart.
+- **Alternatives:** `@tool`-decorated functions (more magic, less explicit validation and error control).
+
+## D16. Graph: router plan + explicit ReAct loop
+
+- **What:** `guardrail → router → steps → composer`. The router (structured output) returns an intent and an ordered list of steps (`transactions`, `knowledge`, `export`). Each step node removes itself from the plan when done; a routing function sends the graph to the next step. The transactions agent is a hand-written ReAct loop: `agent ⇄ tools`, capped at 8 rounds.
+- **Why:** a plan list supports mixed questions ("my cashback + the cashback rules") without a combinatorial number of edges. The explicit loop is ~30 lines, every step is visible in the graph and in traces, and the step cap is mine to control.
+- **Alternatives:** `create_react_agent` / `create_agent` prebuilt (less code, but hides the loop I need to explain and record), a supervisor LLM that decides after each step (more flexible, more LLM calls, more ways to fail).
+- **Trade-offs:** the plan is fixed after routing; the graph can't decide halfway that it also needs documents. Fine for these question types.
+
+## D17. State: conversation vs. per-turn data
+
+- **What:** `messages` (questions and final answers) is checkpointed across turns. Everything else (plan, tool results, scratchpad of tool calls, docs, citations) is per turn and reset by the guardrail node at the start of each turn. ReAct messages live in `scratchpad`, not in `messages`. The graph has a separate input schema: callers send only messages.
+- **Why:** keeping tool chatter out of the conversation keeps later prompts small (cost, latency) and stops old tool output from being mistaken for fresh data. Overwrite semantics for per-turn fields avoid reducer tricks for resetting lists.
+- **Trade-offs:** a follow-up ("and in November?") re-runs tools instead of reusing previous results. The SQLite cache makes that cheap.
+
+## D18. Prompt-injection defence in code, at two boundaries
+
+- **What:** (1) the user's message is checked with a regex for instruction-override patterns (EN/UK/RU) before any model call, and refused. (2) Every merchant name and comment leaving a tool passes through `sanitize`, which replaces instruction-like text with `[removed: instruction-like text]` and sets `suspicious_text_removed`. Prompts also say tool output is data.
+- **Why:** prompts alone are not a defence. The model reads whatever we put in front of it. Data-side sanitization means the planted "IGNORE ALL PREVIOUS INSTRUCTIONS" merchant never reaches a prompt at all (there's a test that checks the composer prompt). Regex is deterministic, free and explainable.
+- **Alternatives:** an LLM or classifier guard (e.g. Llama Guard, a fine-tuned detector): catches paraphrases, but costs a call and can itself be fooled.
+- **Trade-offs:** a paraphrased injection gets past the regex. Defence in depth still holds: tools can't write anything, SQL is parametrized and card numbers are already masked. The eval set includes injection cases to measure this.
+
+## D19. Numbers in the answer are checked against tool results
+
+- **What:** the composer's answer is parsed for numbers (handles `5 863,87`, `1,360.96`, `-250`, `30%`). Each must match a number in the tool results, their arguments or the question (allowing rounding and sign). If not, the composer gets one rewrite request listing the bad numbers; if it still fails, the answer carries a visible warning.
+- **Why:** "refuses to invent figures" should be enforced, not just requested. This is cheap and catches the most damaging failure in a finance assistant.
+- **Limits:** small integers (≤ 31) pass unchecked: counts, days, "3 months" (a `shortcut:` comment marks this). It checks numbers, not reasoning. Seen live: all numbers grounded, yet the answer said "no car expenses in October" when there were ₴23,050. That is why M4 adds an LLM-judge faithfulness metric.
+
+## D20. Human-in-the-loop export with `interrupt()` and a SQLite checkpointer
+
+- **What:** "export a report" routes to `transactions → export`. The export node calls `interrupt()`, the graph state is saved to the checkpointer, and the caller (CLI now, API later) asks the user; `Command(resume=True)` writes a Markdown report, `False` writes nothing.
+- **Why:** nothing in this app writes to the bank, but writing a file with financial data is an action the user should confirm, and it's the pattern any real action (payment, transfer) would need. With a checkpointer the pause survives process restarts: approval can come minutes later from a different request.
+- **Alternatives:** asking in the composer text and parsing the next message (fragile), no confirmation.
+
+## D21. One model string per node; local Qwen by default
+
+- **What:** `ROUTER_MODEL`, `AGENT_MODEL`, `COMPOSER_MODEL` are `provider:model` strings passed to LangChain's `init_chat_model`. The default is `ollama:qwen3.6:35b-a3b-q4_K_M` for all three, with Qwen's thinking mode off and temperature 0.
+- **Why:** per-node choice is what makes "small model for routing, larger for answers" a config change, not a code change, and it's exactly what the provider comparison in the eval needs. Qwen3.6 35B-A3B is a mixture-of-experts model (~3B active parameters), so it runs fast on a laptop and handles tool calling well; it's also multilingual (Ukrainian). Thinking off: about 2× faster, and tool calls didn't need it in testing.
+- **Trade-offs:** `init_chat_model` needs each provider's integration package installed. Only `langchain-ollama` is added now; the others come with the provider comparison (M4).
+- **Today's date:** the agent's "today" is fixed at 2025-12-31 in synthetic mode, so "October" always means October 2025 and eval answers never drift. Real mode uses the real date.
+
+## D22. Graph tests with a scripted fake model
+
+- **What:** `tests/conftest.py::Scripted` is a `BaseChatModel` that returns pre-written messages in order and records every prompt. Router decisions are scripted as tool calls, which LangChain's default `with_structured_output` parses.
+- **Why:** graph logic (routing, loop bounds, retries, refusals, interrupts, memory) must be tested deterministically and offline. Recording prompts lets tests assert what the model *saw*, e.g. that injected text never reached the composer.
+- **Trade-offs:** these tests prove the wiring, not answer quality. Quality is the eval's job (M4).
