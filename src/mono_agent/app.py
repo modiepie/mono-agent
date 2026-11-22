@@ -9,6 +9,7 @@ from mono_agent.graph.builder import Models, build_graph
 from mono_agent.mono.cache import Cache
 from mono_agent.mono.factory import build_client
 from mono_agent.providers import chat_model
+from mono_agent.rag import build_retriever, retrieve_fn
 from mono_agent.tools.finance import ToolContext
 
 
@@ -21,4 +22,6 @@ def build_app(settings: Settings):
     )
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(settings.checkpoint_db, check_same_thread=False)
-    return build_graph(models, ctx, settings.data_dir / "exports", SqliteSaver(conn))
+    retriever = build_retriever(settings)
+    retrieve = retrieve_fn(retriever, settings) if retriever else None
+    return build_graph(models, ctx, settings.data_dir / "exports", SqliteSaver(conn), retrieve)

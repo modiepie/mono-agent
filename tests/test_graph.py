@@ -18,13 +18,13 @@ OCT_TAXI = {
 }
 
 
-def make(ctx, tmp_path: Path, router=(), agent=(), composer=()):
+def make(ctx, tmp_path: Path, router=(), agent=(), composer=(), retrieve=None):
     models = Models(
         Scripted(replies=list(router)),
         Scripted(replies=list(agent)),
         Scripted(replies=list(composer)),
     )
-    graph = build_graph(models, ctx, tmp_path / "exports", InMemorySaver())
+    graph = build_graph(models, ctx, tmp_path / "exports", InMemorySaver(), retrieve)
     return graph, models
 
 
@@ -189,3 +189,73 @@ def test_forecast_answer_gets_one_line_disclaimer(ctx, tmp_path):
     )
     out = ask(graph, "If I cut restaurants by 30%, how much do I save in 3 months?")
     assert out["messages"][-1].content.endswith("_This is not financial advice._")
+
+
+GRACE = {
+    "id": "credit-limit#2",
+    "doc_id": "credit-limit",
+    "title": "Кредитний ліміт",
+    "section": "Пільговий період до 62 днів",
+    "date": "2025-08-15",
+    "sample": True,
+    "text": "Пільговий період триває до 62 днів.",
+    "score": 0.9,
+}
+
+
+def test_knowledge_question_cites_only_retrieved_chunks(ctx, tmp_path):
+    queries = []
+    graph, models = make(
+        ctx,
+        tmp_path,
+        router=[route("knowledge", ["knowledge"])],
+        composer=[AIMessage("Пільговий період — до 62 днів [credit-limit#2] [made-up#7].")],
+        retrieve=lambda q: queries.append(q) or [GRACE],
+    )
+    out = ask(graph, "Як працює пільговий період?")
+    assert queries == ["Як працює пільговий період?"]  # first turn: no rewrite call
+    assert out["citations"] == [{"kind": "doc", "ref": "credit-limit#2"}]
+    assert "62 днів" in str(models.composer.prompts[0][0].content)  # type: ignore[attr-defined]
+    assert "⚠️" not in out["messages"][-1].content  # 62 is grounded in the document
+
+
+def test_follow_up_is_rewritten_into_standalone_query(ctx, tmp_path):
+    queries = []
+    graph, _ = make(
+        ctx,
+        tmp_path,
+        router=[
+            route("knowledge", ["knowledge"]),
+            route("knowledge", ["knowledge"]),
+            AIMessage("комісія за зняття готівки з кредитного ліміту"),
+        ],
+        composer=[AIMessage("До 62 днів [credit-limit#2]."), AIMessage("Немає даних.")],
+        retrieve=lambda q: queries.append(q) or [GRACE],
+    )
+    ask(graph, "Як працює пільговий період?", thread="k")
+    ask(graph, "а для готівки?", thread="k")
+    assert queries[1] == "комісія за зняття готівки з кредитного ліміту"
+
+
+def test_mixed_question_runs_both_steps(ctx, tmp_path):
+    graph, _ = make(
+        ctx,
+        tmp_path,
+        router=[route("mixed", ["transactions", "knowledge"])],
+        agent=[tool_call("aggregate_spending", OCT_TAXI), AIMessage("done")],
+        composer=[AIMessage("Taxi 5 864 UAH; cashback rules [credit-limit#2].")],
+        retrieve=lambda q: [GRACE],
+    )
+    out = ask(graph, "My taxi spend in October and what cashback do I get for taxis?")
+    assert [c["kind"] for c in out["citations"]] == ["tool", "doc"]
+
+
+def test_no_retriever_means_composer_is_told_there_are_no_documents(ctx, tmp_path):
+    graph, models = make(
+        ctx,
+        tmp_path,
+        router=[route("knowledge", ["knowledge"])],
+        composer=[AIMessage("I don't have documents on that.")],
+    )
+    ask(graph, "What is the cashback limit?")
+    assert "No relevant documents found." in str(models.composer.prompts[0][0].content)  # type: ignore[attr-defined]

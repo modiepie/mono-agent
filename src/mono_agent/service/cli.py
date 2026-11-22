@@ -30,7 +30,15 @@ def main() -> None:
     ask.add_argument("--thread", default=None, help="continue a conversation")
     chat = sub.add_parser("chat", help="interactive conversation")
     chat.add_argument("--thread", default=None)
+    sub.add_parser("index", help="index data/docs into Qdrant (both chunking strategies)")
     args = parser.parse_args()
+
+    if args.cmd == "index":
+        from mono_agent.rag import index_docs
+
+        for name, n in index_docs(get_settings(), ["fixed", "structure"]).items():
+            print(f"{name}: {n} chunks")
+        return
 
     app = build_app(get_settings())
     thread = args.thread or uuid.uuid4().hex[:8]

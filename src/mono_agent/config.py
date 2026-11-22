@@ -2,6 +2,7 @@
 
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -25,6 +26,16 @@ class Settings(BaseSettings):
     router_model: str = LOCAL_MODEL
     agent_model: str = LOCAL_MODEL
     composer_model: str = LOCAL_MODEL
+
+    # Retrieval (each stage switchable for the eval's ablation).
+    qdrant_url: str = "http://localhost:6333"
+    docs_dir: Path = Path("data/docs")
+    embeddings: str = "local:BAAI/bge-m3"
+    reranker: str = "BAAI/bge-reranker-v2-m3"
+    chunking: Literal["fixed", "structure"] = "structure"
+    retrieval_mode: Literal["dense", "bm25", "hybrid"] = "hybrid"
+    rerank: bool = True
+    top_k: int = 5
 
     @property
     def use_real_api(self) -> bool:

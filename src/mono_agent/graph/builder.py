@@ -10,6 +10,7 @@ The plan from the router is a list of steps; every step node pops itself when do
 
 import json
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -34,6 +35,10 @@ from mono_agent.tools.finance import ToolContext
 
 MAX_AGENT_STEPS = 8  # tool-calling rounds per turn; stops runaway ReAct loops
 HISTORY = 6  # previous messages shown to router/agent: enough for follow-ups, cheap
+_CITE = re.compile(r"\[([\w.-]+#\d+)\]")
+
+# query -> retrieved chunks as dicts (id, doc_id, title, section, date, sample, text, score)
+Retrieve = Callable[[str], list[dict]]
 
 
 @dataclass
@@ -59,8 +64,11 @@ def _history(state: AgentState) -> list[AnyMessage]:
 
 
 class Nodes:
-    def __init__(self, models: Models, ctx: ToolContext, export_dir: Path) -> None:
+    def __init__(
+        self, models: Models, ctx: ToolContext, export_dir: Path, retrieve: Retrieve | None = None
+    ) -> None:
         self.models = models
+        self.retrieve = retrieve
         self.ctx = ctx
         self.export_dir = export_dir
         self.agent_llm = models.agent.bind_tools([t.schema() for t in TOOLS.values()])
@@ -126,8 +134,17 @@ class Nodes:
         return {"scratchpad": [*state["scratchpad"], *messages], "tool_results": results}
 
     def knowledge(self, state: AgentState) -> dict:
-        # Milestone 3 replaces this with hybrid retrieval over data/docs.
-        return {"retrieved_docs": [], "plan": state["plan"][1:]}
+        """RAG step. A follow-up ("а в євро?") is first rewritten into a standalone query;
+        a first message is searched as is, which saves a model call."""
+        update: dict = {"plan": state["plan"][1:], "retrieved_docs": []}
+        if self.retrieve is None:  # e.g. Qdrant not running: answer says no documents
+            return update
+        query = _question(state)
+        if len(_history(state)) > 1:
+            system = SystemMessage(prompts.STANDALONE_QUERY)
+            query = str(self.models.router.invoke([system, *_history(state)]).content).strip()
+        update["retrieved_docs"] = self.retrieve(query)
+        return update
 
     def export(self, state: AgentState) -> dict:
         ok = [r for r in state.get("tool_results", []) if r["ok"]]
@@ -153,9 +170,10 @@ class Nodes:
         results = [r for r in state.get("tool_results", []) if r["ok"]]
         docs = state.get("retrieved_docs", [])
         if docs:
-            docs_text = json.dumps(docs, ensure_ascii=False)
+            shown = [{k: d[k] for k in ("id", "title", "section", "date", "text")} for d in docs]
+            docs_text = json.dumps(shown, ensure_ascii=False)
         elif state.get("intent") in ("knowledge", "mixed"):
-            docs_text = prompts.NO_KNOWLEDGE_YET
+            docs_text = prompts.NO_KNOWLEDGE
         else:
             docs_text = "none"
         compact = [
@@ -188,8 +206,11 @@ class Nodes:
             answer += f"\n\n📄 {state['export_path']}"
         if any(r["tool"] == "forecast_savings" for r in results):
             answer += "\n\n" + prompts.DISCLAIMER[lang(question)]
+        # Doc citations = chunks the answer actually cites (and that were really retrieved).
+        retrieved = {d["id"] for d in docs}
+        cited = [c for c in dict.fromkeys(_CITE.findall(answer)) if c in retrieved]
         citations = [{"kind": "tool", "ref": r["id"]} for r in results] + [
-            {"kind": "doc", "ref": d.get("id", "")} for d in docs
+            {"kind": "doc", "ref": c} for c in cited
         ]
         return {"messages": [AIMessage(answer)], "citations": citations}
 
@@ -214,9 +235,13 @@ def _after_agent(state: AgentState) -> str:
 
 
 def build_graph(
-    models: Models, ctx: ToolContext, export_dir: Path, checkpointer: Checkpointer = None
+    models: Models,
+    ctx: ToolContext,
+    export_dir: Path,
+    checkpointer: Checkpointer = None,
+    retrieve: Retrieve | None = None,
 ):
-    nodes = Nodes(models, ctx, export_dir)
+    nodes = Nodes(models, ctx, export_dir, retrieve)
     g = StateGraph(AgentState, input_schema=InputState)
     g.add_node("guardrail", nodes.guardrail)
     g.add_node("router", nodes.router)
