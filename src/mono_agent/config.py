@@ -1,9 +1,12 @@
 """All runtime configuration, read from environment / .env."""
 
+from datetime import date
 from pathlib import Path
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+LOCAL_MODEL = "ollama:qwen3.6:35b-a3b-q4_K_M"
 
 
 class Settings(BaseSettings):
@@ -15,14 +18,32 @@ class Settings(BaseSettings):
 
     data_dir: Path = Path("data")
     synthetic_seed: int = 42
+    # The agent's "today". Synthetic data covers 2025, so it defaults to 2025-12-31 there.
+    as_of: date | None = None
+
+    # "provider:model" per node, as accepted by langchain's init_chat_model.
+    router_model: str = LOCAL_MODEL
+    agent_model: str = LOCAL_MODEL
+    composer_model: str = LOCAL_MODEL
 
     @property
     def use_real_api(self) -> bool:
         return self.mono_token is not None
 
     @property
+    def today(self) -> date:
+        if self.as_of:
+            return self.as_of
+        return date.today() if self.use_real_api else date(2025, 12, 31)
+
+    @property
     def cache_db(self) -> Path:
-        return self.data_dir / "cache.sqlite"
+        # Separate files so synthetic data can never mix with real data.
+        return self.data_dir / ("cache.sqlite" if self.use_real_api else "synthetic.sqlite")
+
+    @property
+    def checkpoint_db(self) -> Path:
+        return self.data_dir / "checkpoints.sqlite"
 
 
 def get_settings() -> Settings:
