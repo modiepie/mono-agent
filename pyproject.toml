@@ -3,6 +3,7 @@ name = "mono-agent"
 version = "0.1.0"
 description = "LangGraph multi-agent personal-finance assistant over the monobank Personal API"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12,<3.13"
 # Dependencies are added per milestone, only when code uses them.
 dependencies = [

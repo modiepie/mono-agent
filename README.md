@@ -1,5 +1,8 @@
 # mono-agent
 
+[![CI](https://github.com/modiepie/mono-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/modiepie/mono-agent/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A LangGraph multi-agent assistant for personal finances on top of the
 [monobank Personal API](https://api.monobank.ua/docs/). Ask in Ukrainian or English:
 
@@ -196,3 +199,8 @@ docs/          decisions.md (51 design decisions), interview-notes.md
 - [docs/interview-notes.md](docs/interview-notes.md): likely questions about this project with
   short answers.
 - [eval/report.md](eval/report.md): full evaluation report.
+
+## License
+
+MIT, see [LICENSE](LICENSE). Not affiliated with monobank; "monobank" is used only to name the
+public API this project works with.
