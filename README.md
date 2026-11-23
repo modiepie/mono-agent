@@ -139,11 +139,22 @@ Open http://localhost:8501. The first start downloads the embedding and reranker
 - **Other models:** set `ROUTER_MODEL`, `AGENT_MODEL`, `COMPOSER_MODEL`, `FALLBACK_MODEL` to any
   `provider:model` (e.g. `anthropic:claude-sonnet-5-5`, `openrouter:...`) and the matching key.
 
+## MCP server
+
+The seven finance tools are also an [MCP](https://modelcontextprotocol.io) server, so any MCP
+client (Claude Desktop, an IDE, another agent) can use them without this project's graph. Same
+validation and masking; synthetic data unless `MONO_TOKEN` is set. Note that with real data,
+the client's model sees your (masked) transactions.
+
+```json
+{"mcpServers": {"mono-agent": {"command": "uv", "args": ["--directory", "/path/to/mono-agent", "run", "mono-agent-mcp"]}}}
+```
+
 ## Development
 
 ```bash
 uv sync
-uv run pytest                          # 135 tests, no network, no models
+uv run pytest                          # 136 tests, no network, no models
 uv run mono-agent ask "Скільки я витратив на таксі в жовтні?"
 uv run mono-agent chat                 # interactive, conversation memory per thread
 uv run mono-agent index                # (re)index data/docs into Qdrant, both chunkings
@@ -174,10 +185,10 @@ src/mono_agent/
   graph/       state, prompts, nodes (guardrail, router, ReAct agent, knowledge, export, composer)
   rag/         HTML/PDF loaders, 2 chunkers, embeddings, Qdrant, BM25, RRF, reranker
   providers/   model per node, fallbacks, token/cost/latency tracking
-  service/     FastAPI (SSE), Streamlit UI, CLI
+  service/     FastAPI (SSE), Streamlit UI, CLI, MCP server
   guardrails.py  injection detection, number grounding
 eval/          dataset (77 q), ground truth, metrics, judge, ablation, replay, report
-docs/          decisions.md (51 design decisions), interview-notes.md
+docs/          decisions.md (52 design decisions), interview-notes.md
 ```
 
 ## Limitations
