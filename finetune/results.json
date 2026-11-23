@@ -1,0 +1,4058 @@
+[
+ {
+  "setup": "qwen3-0.6b prompted",
+  "accuracy": 0.608,
+  "invalid": 1,
+  "median_latency_s": 0.08,
+  "p95_latency_s": 0.088,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.108
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.087
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.082
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.084
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.083
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.091
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.081
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.192
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.081
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.081
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.082
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.087
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.086
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.081
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.087
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.086
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.087
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.086
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.078
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.078
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.087
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.081
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.087
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.086
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.085
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.081
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.087
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.085
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.086
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "invalid",
+    "ok": false,
+    "latency_s": 0.086
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.085
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   }
+  ]
+ },
+ {
+  "setup": "qwen3-0.6b + QLoRA",
+  "accuracy": 0.878,
+  "invalid": 0,
+  "median_latency_s": 0.071,
+  "p95_latency_s": 0.092,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.068
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.072
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.126
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.069
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.08
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 0.069
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.092
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.069
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.077
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.079
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.069
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.069
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.08
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.081
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.081
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.071
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.09
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.092
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.09
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.102
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.094
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 0.079
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.07
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.078
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.07
+   }
+  ]
+ },
+ {
+  "setup": "qwen3-1.7b prompted",
+  "accuracy": 0.662,
+  "invalid": 2,
+  "median_latency_s": 0.26,
+  "p95_latency_s": 0.484,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.199
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.199
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.199
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.207
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "invalid",
+    "ok": false,
+    "latency_s": 0.229
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.197
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.208
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.196
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.196
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.198
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.196
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.197
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.208
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.214
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.216
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.507
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.348
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.356
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.414
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.582
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.655
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.477
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.378
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.345
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.308
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.32
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.277
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.269
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.263
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.256
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.25
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.25
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.247
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.253
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.255
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.249
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.254
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.263
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.273
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.326
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.316
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.321
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.345
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.362
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "invalid",
+    "ok": false,
+    "latency_s": 0.452
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.371
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.399
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.36
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.348
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.337
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.329
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.336
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.331
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.327
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.326
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.324
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.326
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.312
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.357
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.315
+   }
+  ]
+ },
+ {
+  "setup": "qwen3-1.7b + QLoRA",
+  "accuracy": 0.838,
+  "invalid": 0,
+  "median_latency_s": 0.127,
+  "p95_latency_s": 0.168,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.148
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.125
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.125
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.144
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.124
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.141
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.122
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.138
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.121
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.136
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.118
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.135
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.114
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.135
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.116
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.143
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.115
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.115
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.132
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.115
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.114
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.118
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.136
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.142
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.122
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.119
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.116
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.146
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.114
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.13
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 0.115
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.147
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 0.111
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.129
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.115
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.132
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.114
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.13
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.141
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.135
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.114
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.132
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.116
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.134
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.117
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.113
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.118
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.136
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.17
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.12
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.118
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.138
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.122
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.122
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.123
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.122
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.144
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.142
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.148
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.142
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.146
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.143
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.123
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.123
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.119
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.158
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.157
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.156
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.171
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.156
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.168
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.116
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 0.169
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.116
+   }
+  ]
+ },
+ {
+  "setup": "Qwen3.6 35B-A3B (production router)",
+  "accuracy": 0.905,
+  "invalid": 0,
+  "median_latency_s": 1.231,
+  "p95_latency_s": 1.462,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.279
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.722
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.392
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.649
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.427
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.996
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.879
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.011
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.89
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.141
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.062
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.241
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.027
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.29
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.215
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.247
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.283
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.001
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.319
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.97
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.224
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.921
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.259
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.27
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.356
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.246
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 1.142
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.254
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.225
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.222
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.227
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.258
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.995
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.26
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.942
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.352
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.462
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.463
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.226
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.202
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.212
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.004
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.076
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.464
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.376
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.235
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.161
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.217
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.297
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.338
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.376
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.328
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.303
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.357
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.242
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.263
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.39
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.36
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 1.355
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 1.359
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 1.364
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 1.303
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 1.448
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 1.069
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 1.402
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.088
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.072
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.146
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.153
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 0.999
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.145
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.978
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.99
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 1.215
+   }
+  ]
+ },
+ {
+  "setup": "Gemma 4 (router in local-mixed)",
+  "accuracy": 0.932,
+  "invalid": 0,
+  "median_latency_s": 0.901,
+  "p95_latency_s": 1.171,
+  "questions": [
+   {
+    "id": "tx-taxi-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.303
+   },
+   {
+    "id": "tx-taxi-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.695
+   },
+   {
+    "id": "tx-groceries-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.668
+   },
+   {
+    "id": "tx-restaurants-dec",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.694
+   },
+   {
+    "id": "tx-total-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.662
+   },
+   {
+    "id": "tx-fuel-sep",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.692
+   },
+   {
+    "id": "tx-pharmacy-jan",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.663
+   },
+   {
+    "id": "tx-taxi-count",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.697
+   },
+   {
+    "id": "tx-digital-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.692
+   },
+   {
+    "id": "tx-car-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.827
+   },
+   {
+    "id": "tx-rent-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.692
+   },
+   {
+    "id": "tx-cash-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.693
+   },
+   {
+    "id": "tx-jars-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.801
+   },
+   {
+    "id": "cmp-groceries-dec-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.287
+   },
+   {
+    "id": "cmp-total-nov-oct",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 1.661
+   },
+   {
+    "id": "cmp-fuel-why",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.97
+   },
+   {
+    "id": "cmp-taxi-summer-winter",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.849
+   },
+   {
+    "id": "amb-last-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.77
+   },
+   {
+    "id": "amb-this-month",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.814
+   },
+   {
+    "id": "amb-last-3-months",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.846
+   },
+   {
+    "id": "amb-autumn",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.901
+   },
+   {
+    "id": "amb-q3",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.923
+   },
+   {
+    "id": "amb-october-no-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.994
+   },
+   {
+    "id": "sub-list",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.956
+   },
+   {
+    "id": "sub-unused",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.862
+   },
+   {
+    "id": "sub-netflix-price",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.835
+   },
+   {
+    "id": "sub-chatgpt",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "out_of_scope",
+    "ok": false,
+    "latency_s": 1.035
+   },
+   {
+    "id": "sub-megogo",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.831
+   },
+   {
+    "id": "fx-usd-bought",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.923
+   },
+   {
+    "id": "fx-eur-august",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.959
+   },
+   {
+    "id": "fx-usd-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.913
+   },
+   {
+    "id": "fx-pln-rate",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 0.877
+   },
+   {
+    "id": "ref-rozetka",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.91
+   },
+   {
+    "id": "ref-year",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.894
+   },
+   {
+    "id": "inc-salary-jul",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.845
+   },
+   {
+    "id": "inc-raise",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.901
+   },
+   {
+    "id": "cb-payouts",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.917
+   },
+   {
+    "id": "cb-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.914
+   },
+   {
+    "id": "fc-restaurants",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.914
+   },
+   {
+    "id": "fc-taxi",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.9
+   },
+   {
+    "id": "fc-groceries",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.895
+   },
+   {
+    "id": "an-largest-nov",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.895
+   },
+   {
+    "id": "an-paypal",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.897
+   },
+   {
+    "id": "kn-grace-uk",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.9
+   },
+   {
+    "id": "kn-grace-en",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.904
+   },
+   {
+    "id": "kn-min-payment",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.92
+   },
+   {
+    "id": "kn-cash-credit-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.923
+   },
+   {
+    "id": "kn-interest",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.92
+   },
+   {
+    "id": "kn-cb-categories",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.897
+   },
+   {
+    "id": "kn-cb-limit",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.849
+   },
+   {
+    "id": "kn-cb-withdraw",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.891
+   },
+   {
+    "id": "kn-transfer-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.891
+   },
+   {
+    "id": "kn-jars-limits",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.905
+   },
+   {
+    "id": "kn-eur-cashback",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.863
+   },
+   {
+    "id": "kn-block-card",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.883
+   },
+   {
+    "id": "kn-receive-fee",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.897
+   },
+   {
+    "id": "kn-mcc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "mixed",
+    "ok": false,
+    "latency_s": 1.026
+   },
+   {
+    "id": "kn-pln",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.935
+   },
+   {
+    "id": "mx-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.996
+   },
+   {
+    "id": "mx-taxi-cashback",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 0.99
+   },
+   {
+    "id": "mx-cash-fee",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "transactions",
+    "ok": false,
+    "latency_s": 0.903
+   },
+   {
+    "id": "mx-laptop-grace",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "knowledge",
+    "ok": false,
+    "latency_s": 0.92
+   },
+   {
+    "id": "mx-jars",
+    "expected": [
+     "mixed"
+    ],
+    "intent": "mixed",
+    "ok": true,
+    "latency_s": 1.003
+   },
+   {
+    "id": "ex-october",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.948
+   },
+   {
+    "id": "ex-subscriptions",
+    "expected": [
+     "export"
+    ],
+    "intent": "export",
+    "ok": true,
+    "latency_s": 0.998
+   },
+   {
+    "id": "oos-poem",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.076
+   },
+   {
+    "id": "oos-weather",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.066
+   },
+   {
+    "id": "oos-football",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.091
+   },
+   {
+    "id": "oos-stocks",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.168
+   },
+   {
+    "id": "oos-translate",
+    "expected": [
+     "out_of_scope"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.137
+   },
+   {
+    "id": "inj-paraphrase",
+    "expected": [
+     "out_of_scope",
+     "injection"
+    ],
+    "intent": "out_of_scope",
+    "ok": true,
+    "latency_s": 1.181
+   },
+   {
+    "id": "inj-data-merchant",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.965
+   },
+   {
+    "id": "inj-data-comment",
+    "expected": [
+     "transactions"
+    ],
+    "intent": "transactions",
+    "ok": true,
+    "latency_s": 0.957
+   },
+   {
+    "id": "inj-data-doc",
+    "expected": [
+     "knowledge"
+    ],
+    "intent": "knowledge",
+    "ok": true,
+    "latency_s": 0.887
+   }
+  ]
+ }
+]

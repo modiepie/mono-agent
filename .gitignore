@@ -11,3 +11,4 @@ data/real/
 *.sqlite-journal
 data/exports/
 .claude/
+finetune/adapters/

@@ -45,6 +45,12 @@ ground truth computed independently from the data ([full report](eval/report.md)
   hybrid BM25 + dense *without* a reranker is worse (MRR 0.65 vs 0.90), because BM25 can't match
   English questions to Ukrainian documents. The cross-encoder reranker recovers it.
 
+**Fine-tuned router (QLoRA).** A 4-bit Qwen3 0.6B with LoRA adapters, trained for 3 minutes on a
+laptop (MLX) on template questions written apart from the eval, routes the eval questions at
+**88%** vs 61% prompted, close to the prompted 35B production router (90%) at **71 ms instead
+of 1.2 s**. It still misses mixed questions and phrasings the templates lack, so it is measured,
+not shipped ([report](finetune/report.md), D53).
+
 ## Architecture
 
 ```mermaid
@@ -154,7 +160,7 @@ the client's model sees your (masked) transactions.
 
 ```bash
 uv sync
-uv run pytest                          # 136 tests, no network, no models
+uv run pytest                          # 139 tests, no network, no models
 uv run mono-agent ask "Скільки я витратив на таксі в жовтні?"
 uv run mono-agent chat                 # interactive, conversation memory per thread
 uv run mono-agent index                # (re)index data/docs into Qdrant, both chunkings
@@ -169,6 +175,15 @@ uv run python -m eval.run --config local-qwen              # 77 questions -> eva
 uv run python -m eval.run --config openrouter-nemotron --subset core --resume
 uv run python -m eval.run --ablation                       # RAG ablation, no LLM
 uv run python -m eval.run --config local-qwen --subset smoke --replay   # what CI runs
+```
+
+Fine-tuned router (macOS, Apple silicon):
+
+```bash
+uv sync --group finetune
+uv run python -m finetune.router_data                 # training data -> finetune/data
+uv run mlx_lm.lora -c finetune/lora.yaml              # QLoRA, ~3 min on an M1 Max
+uv run python -m finetune.router_eval                 # vs prompting -> finetune/report.md
 ```
 
 ![Langfuse trace](docs/images/langfuse-trace.jpg)
@@ -188,7 +203,8 @@ src/mono_agent/
   service/     FastAPI (SSE), Streamlit UI, CLI, MCP server
   guardrails.py  injection detection, number grounding
 eval/          dataset (77 q), ground truth, metrics, judge, ablation, replay, report
-docs/          decisions.md (52 design decisions), interview-notes.md
+finetune/      QLoRA router: template training data, MLX config, comparison vs prompting
+docs/          decisions.md (53 design decisions), interview-notes.md
 ```
 
 ## Limitations

@@ -1,0 +1,19 @@
+# QLoRA router: LoRA adapters trained on a 4-bit quantized base model with mlx-lm.
+#   uv run --group finetune mlx_lm.lora -c finetune/lora.yaml
+#   (1.7B: add --model mlx-community/Qwen3-1.7B-4bit --adapter-path finetune/adapters/qwen3-1.7b)
+model: mlx-community/Qwen3-0.6B-4bit
+adapter_path: finetune/adapters/qwen3-0.6b
+data: finetune/data
+train: true
+fine_tune_type: lora
+mask_prompt: true        # loss only on the label, not on the system prompt and question
+num_layers: -1           # adapters on every layer; the model is small
+lora_parameters: {rank: 8, scale: 20.0, dropout: 0.0}
+batch_size: 8
+iters: 300               # ~2.5 epochs over 941 examples
+learning_rate: 1.0e-4
+steps_per_report: 25
+steps_per_eval: 50
+val_batches: -1
+max_seq_length: 256
+seed: 0

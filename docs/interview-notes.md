@@ -142,6 +142,19 @@ Langfuse shows it per node. In Docker on a Mac, retrieval took 5.4 s because con
 no GPU and the embedding model and reranker ran on CPU; the composer took about 9 s. Fixes in
 production: a GPU embedding service or an API embedding model; a smaller composer model (D47).
 
+**Did you fine-tune anything?**
+A router. QLoRA on 4-bit Qwen3 0.6B with mlx-lm (bitsandbytes needs CUDA), 3 minutes on a
+laptop, trained on template questions written apart from the eval. It went from 61% (prompted)
+to 88%, against 90% for the prompted 35B production router, at 71 ms instead of 1.2 s. I didn't
+add templates for the questions it missed, because the eval is my only test set. I also didn't
+ship it: routing is ~9% of latency, so the next step would be a cascade where the small model
+routes only when it's confident (D53).
+
+**What's the MCP server for?**
+The same seven tools for any MCP client (Claude Desktop, an IDE, another agent). It's ~40 lines
+because schemas, validation and execution come from the tool registry; the safety lives in
+the tools, so MCP clients get the masking and sanitizing too (D52).
+
 ## Safety and privacy
 
 **Prompt injection?**
@@ -198,8 +211,8 @@ with the thread id as session id (D46, D47).
 **What would you do next?**
 A held-out eval set and a stronger, independent judge; a few-shot router prompt (over-routing
 to `mixed` is the top remaining failure); a cashback-by-category tool; re-running the RAG
-ablation on real documents; support for several cards in one currency; and the stretch goal of
-a QLoRA router compared against prompting.
+ablation on real documents; support for several cards in one currency; and a cascade router
+(the fine-tuned 0.6B model when it's confident, the big model otherwise).
 
 **What was the hardest problem?**
 Making "never invent a number" hold even when the model misbehaves. Asking in the prompt is
