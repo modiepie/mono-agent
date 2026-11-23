@@ -30,13 +30,21 @@ class SyncInput(Period):
 
 class QueryInput(Period):
     currency: Currency = Field(default="UAH", description="Which account (by currency)")
-    category: Category | None = None
-    merchant: str | None = Field(
-        default=None, max_length=60, description="Case-insensitive substring"
+    category: Category | None = Field(
+        default=None,
+        description="transfers / jars / currency_exchange / cashback are money moves, not "
+        "spending: use them with kind=all",
     )
-    kind: Literal["spending", "income", "all"] = Field(
+    text: str | None = Field(
+        default=None,
+        max_length=60,
+        description="Case-insensitive substring of the merchant/description or the transfer "
+        "comment. Bank texts are mostly Ukrainian: search 'оренда', not 'rent'.",
+    )
+    kind: Literal["spending", "refunds", "income", "all"] = Field(
         default="all",
-        description="spending = purchases incl. refunds; income = salary, transfers in",
+        description="spending = purchases (refunds included, net); refunds = money returned for "
+        "purchases; income = salary, transfers in, cashback payouts; all = everything",
     )
     min_amount: float | None = Field(
         default=None, ge=0, description="Absolute amount, account currency"
@@ -44,6 +52,17 @@ class QueryInput(Period):
     max_amount: float | None = Field(default=None, ge=0)
     order_by: Literal["time", "amount"] = "time"
     limit: int = Field(default=20, ge=1, le=50)
+
+    @model_validator(mode="after")
+    def _consistent_filters(self) -> Self:
+        # Seen in the eval: category=jars + kind=spending silently returned 0 rows and the
+        # answer said "you put 0 UAH into jars". A contradiction is an error, not an empty set.
+        if self.category in NON_SPENDING and self.kind in ("spending", "refunds"):
+            raise ValueError(
+                f"category={self.category} is not spending, so kind={self.kind} can never match;"
+                " use kind=all"
+            )
+        return self
 
 
 class AggregateInput(Period):

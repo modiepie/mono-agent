@@ -4,14 +4,53 @@ import math
 import re
 from collections import Counter
 
-STOPWORDS = frozenset({
-    # Ukrainian
-    "і", "й", "та", "або", "але", "що", "як", "це", "у", "в", "на", "з", "із", "до", "за",
-    "від", "по", "для", "не", "чи", "то",
-    # English
-    "a", "an", "the", "of", "to", "in", "on", "for", "and", "or", "is", "are", "be", "by",
-    "with", "what", "how", "my", "me", "i",
-})  # fmt: skip
+STOPWORDS = frozenset(
+    {
+        # Ukrainian
+        "і",
+        "й",
+        "та",
+        "або",
+        "але",
+        "що",
+        "як",
+        "це",
+        "у",
+        "в",
+        "на",
+        "з",
+        "із",
+        "до",
+        "за",
+        "від",
+        "по",
+        "для",
+        "не",
+        "чи",
+        "то",
+        # English
+        "a",
+        "an",
+        "the",
+        "of",
+        "to",
+        "in",
+        "on",
+        "for",
+        "and",
+        "or",
+        "is",
+        "are",
+        "be",
+        "by",
+        "with",
+        "what",
+        "how",
+        "my",
+        "me",
+        "i",
+    }
+)
 
 
 def tokenize(text: str) -> list[str]:

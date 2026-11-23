@@ -67,6 +67,10 @@ def _period_key(t: int, granularity: str) -> str:
     return d.strftime("%Y-%m-%d")
 
 
+def _contains(haystack: str | None, needle: str) -> bool:
+    return bool(haystack) and needle.casefold() in str(haystack).casefold()
+
+
 def _money(kop: int | float) -> float:
     return round(kop / 100, 2)
 
@@ -85,6 +89,7 @@ class ToolContext:
     def __post_init__(self) -> None:
         self.cache.db.create_function("category", 2, category, deterministic=True)
         self.cache.db.create_function("period_key", 2, _period_key, deterministic=True)
+        self.cache.db.create_function("contains", 2, _contains, deterministic=True)
 
     def account(self, currency: str) -> str:
         if not self._accounts:
@@ -142,13 +147,17 @@ def _where(args: QueryInput | AggregateInput, account: str, start: int, end: int
         clauses.append(_SPENDING)
         params.extend(NON_SPENDING)
         return clauses, params
-    if args.merchant:
-        clauses.append("description LIKE ? ESCAPE '\\'")
-        escaped = args.merchant.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        params.append(f"%{escaped}%")
-    if args.kind == "spending":
+    if args.text:
+        # Python casefold, not SQL LIKE: SQLite's LIKE ignores case only for ASCII, so
+        # "оренда" would never match "Оренда". A plain substring test also has no wildcards
+        # to escape.
+        clauses.append("(contains(description, ?) OR contains(comment, ?))")
+        params += [args.text, args.text]
+    if args.kind in ("spending", "refunds"):
         clauses.append(_SPENDING)
         params.extend(NON_SPENDING)
+        if args.kind == "refunds":
+            clauses.append("amount > 0")
     elif args.kind == "income":
         clauses.append("amount > 0 AND category(mcc, description) IN ('transfers', 'cashback')")
     if args.min_amount is not None:

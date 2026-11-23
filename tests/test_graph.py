@@ -89,7 +89,7 @@ def test_out_of_scope_is_refused_in_users_language(ctx, tmp_path):
 
 
 def test_injection_inside_bank_data_never_reaches_composer(ctx, tmp_path):
-    feb = {"date_from": "2025-02-01", "date_to": "2025-02-28", "merchant": "shop"}
+    feb = {"date_from": "2025-02-01", "date_to": "2025-02-28", "text": "shop"}
     graph, models = make(
         ctx,
         tmp_path,

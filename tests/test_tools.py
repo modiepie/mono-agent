@@ -64,7 +64,7 @@ def test_refunds_reduce_spending(ctx):
     out, _ = run_tool(
         ctx,
         "query_transactions",
-        {"date_from": "2025-03-01", "date_to": "2025-03-31", "merchant": "rozetka"},
+        {"date_from": "2025-03-01", "date_to": "2025-03-31", "text": "rozetka"},
     )
     assert out["total_count"] == 3  # two charges + one refund
     assert out["total_amount"] == -3_499
@@ -121,9 +121,9 @@ def test_injection_text_never_leaves_the_tool(ctx):
 
 
 def test_sql_injection_in_merchant_is_just_a_string(ctx):
-    out, ok = run_tool(ctx, "query_transactions", {**OCT, "merchant": "%' OR 1=1 --"})
+    out, ok = run_tool(ctx, "query_transactions", {**OCT, "text": "%' OR 1=1 --"})
     assert ok and out["total_count"] == 0
-    out, ok = run_tool(ctx, "query_transactions", {**OCT, "merchant": "%"})
+    out, ok = run_tool(ctx, "query_transactions", {**OCT, "text": "%"})
     assert ok and out["total_count"] == 0  # % is escaped, not a wildcard
 
 
@@ -166,3 +166,29 @@ def test_empty_period_is_an_error_that_names_available_data(ctx):
     )
     assert not ok
     assert "2025-10-01" in out["error"] and "check the year" in out["error"]
+
+
+def test_text_search_covers_comments_and_finds_rent(ctx):
+    out, ok = run_tool(
+        ctx,
+        "query_transactions",
+        {"date_from": "2025-01-01", "date_to": "2025-12-31", "text": "оренда"},
+    )
+    assert ok and out["total_count"] == 12 and out["total_amount"] == -180_000
+
+
+def test_refunds_kind_lists_only_returned_purchases(ctx):
+    out, ok = run_tool(
+        ctx,
+        "query_transactions",
+        {"date_from": "2025-01-01", "date_to": "2025-12-31", "kind": "refunds"},
+    )
+    assert ok and sorted(i["amount"] for i in out["items"]) == [3200, 3499]
+
+
+def test_contradictory_filters_are_an_error_not_an_empty_result(ctx):
+    args = {"date_from": "2025-01-01", "date_to": "2025-12-31", "category": "jars"}
+    out, ok = run_tool(ctx, "query_transactions", {**args, "kind": "spending"})
+    assert not ok and "kind=all" in str(out)
+    out, ok = run_tool(ctx, "query_transactions", {**args, "kind": "all"})
+    assert ok and out["total_amount"] == -57_000

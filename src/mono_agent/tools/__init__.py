@@ -49,7 +49,7 @@ TOOLS: dict[str, ToolSpec] = {
         ToolSpec(
             "query_transactions",
             "List individual transactions with filters "
-            "(category, merchant substring, spending/income, amount range).",
+            "(category, text in description or comment, spending/refunds/income, amount range).",
             QueryInput,
             finance.query_transactions,
         ),
