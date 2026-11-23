@@ -1,0 +1,141 @@
+[
+ {
+  "chunking": "fixed",
+  "mode": "bm25",
+  "questions": 21,
+  "recall@1": 0.47619047619047616,
+  "recall@3": 0.5714285714285714,
+  "recall@5": 0.5714285714285714,
+  "mrr": 0.5238095238095238,
+  "latency_ms": 0.0,
+  "misses@5": [
+   "kn-grace-en",
+   "kn-cash-credit-fee",
+   "kn-cb-limit",
+   "kn-jars-limits",
+   "mx-taxi-cashback",
+   "mx-cash-fee",
+   "mx-laptop-grace",
+   "mx-jars",
+   "inj-data-doc"
+  ]
+ },
+ {
+  "chunking": "fixed",
+  "mode": "dense",
+  "questions": 21,
+  "recall@1": 0.7619047619047619,
+  "recall@3": 0.9047619047619048,
+  "recall@5": 1.0,
+  "mrr": 0.8468253968253968,
+  "latency_ms": 236.8,
+  "misses@5": []
+ },
+ {
+  "chunking": "fixed",
+  "mode": "hybrid",
+  "questions": 21,
+  "recall@1": 0.5238095238095238,
+  "recall@3": 0.8571428571428571,
+  "recall@5": 0.9523809523809523,
+  "mrr": 0.6722222222222222,
+  "latency_ms": 33.3,
+  "misses@5": [
+   "kn-cash-credit-fee"
+  ]
+ },
+ {
+  "chunking": "fixed",
+  "mode": "dense+rerank",
+  "questions": 21,
+  "recall@1": 0.7619047619047619,
+  "recall@3": 0.8571428571428571,
+  "recall@5": 0.9523809523809523,
+  "mrr": 0.8333333333333334,
+  "latency_ms": 331.9,
+  "misses@5": [
+   "mx-jars"
+  ]
+ },
+ {
+  "chunking": "fixed",
+  "mode": "hybrid+rerank",
+  "questions": 21,
+  "recall@1": 0.7619047619047619,
+  "recall@3": 0.8571428571428571,
+  "recall@5": 0.9523809523809523,
+  "mrr": 0.8333333333333334,
+  "latency_ms": 296.2,
+  "misses@5": [
+   "mx-jars"
+  ]
+ },
+ {
+  "chunking": "structure",
+  "mode": "bm25",
+  "questions": 21,
+  "recall@1": 0.47619047619047616,
+  "recall@3": 0.47619047619047616,
+  "recall@5": 0.5714285714285714,
+  "mrr": 0.5,
+  "latency_ms": 0.0,
+  "misses@5": [
+   "kn-grace-en",
+   "kn-cash-credit-fee",
+   "kn-cb-limit",
+   "kn-jars-limits",
+   "kn-eur-cashback",
+   "mx-taxi-cashback",
+   "mx-laptop-grace",
+   "mx-jars",
+   "inj-data-doc"
+  ]
+ },
+ {
+  "chunking": "structure",
+  "mode": "dense",
+  "questions": 21,
+  "recall@1": 0.8095238095238095,
+  "recall@3": 1.0,
+  "recall@5": 1.0,
+  "mrr": 0.9047619047619048,
+  "latency_ms": 34.9,
+  "misses@5": []
+ },
+ {
+  "chunking": "structure",
+  "mode": "hybrid",
+  "questions": 21,
+  "recall@1": 0.47619047619047616,
+  "recall@3": 0.8571428571428571,
+  "recall@5": 0.9047619047619048,
+  "mrr": 0.6547619047619048,
+  "latency_ms": 37.5,
+  "misses@5": [
+   "kn-cash-credit-fee",
+   "kn-eur-cashback"
+  ]
+ },
+ {
+  "chunking": "structure",
+  "mode": "dense+rerank",
+  "questions": 21,
+  "recall@1": 0.8095238095238095,
+  "recall@3": 1.0,
+  "recall@5": 1.0,
+  "mrr": 0.9047619047619048,
+  "latency_ms": 267.2,
+  "misses@5": []
+ },
+ {
+  "chunking": "structure",
+  "mode": "hybrid+rerank",
+  "questions": 21,
+  "recall@1": 0.8095238095238095,
+  "recall@3": 1.0,
+  "recall@5": 1.0,
+  "mrr": 0.9047619047619048,
+  "latency_ms": 252.4,
+  "misses@5": []
+ }
+]
