@@ -23,6 +23,11 @@ tests/
 docs/                # plan.md, decisions.md, interview-notes.md
 ```
 
+## Status
+
+- M1–M3 done. M4 done: 77-question eval, provider comparison, RAG ablation, CI replay ([eval/report.md](../eval/report.md)).
+- Next: M5 (FastAPI streaming service, Ukrainian-language UI, Langfuse, Docker Compose, GitHub Actions).
+
 ## Milestones
 
 | # | Scope | Done when |

@@ -202,3 +202,84 @@ Each entry: what, why, alternatives considered, trade-offs. Added as decisions a
 
 - **What:** a period with no transactions at all returns an error naming the cached date range and today's date. `aggregate_spending` rejects non-spending categories with a hint to use `query_transactions`, and reports cashback earned per group.
 - **Why:** seen live: asked about "October", the model queried October 2024 (the data is 2025), got zeros, and the composer said "you received 0 грн cashback". A silent zero is worse than an error: an error message is feedback the model can use, and it did (it retried with 2025). Prompt instructions alone didn't prevent it.
+
+## D32. Ground truth computed from the generator, not written by hand
+
+- **What:** `eval/truth.py` computes expected numbers (spend per category and period, counts, cashback, forecasts, FX, rates) with plain Python over the generator's `StatementItem`s. The dataset refers to them (`{fn: spent, period: 2025-10, category: taxi}`), so nobody types "5863.87" into a YAML file.
+- **Why:** hand-written expected values drift when the generator changes and hide arithmetic mistakes. Computing them independently from the tools' SQL means a bug in a tool can't also be baked into the expected answer. (The tests do the same.) The only shared piece is the MCC → category mapping, which is the *definition* of a category, not a computation.
+- **Trade-offs:** a few expectations are literals where the fact is a planted constant (rent 180 000, car service 23 050); they are cross-checked against the truth functions.
+
+## D33. Dataset: 77 questions, each with machine-checkable expectations
+
+- **What:** `eval/dataset/questions.yaml` covers totals, counts, comparisons and "why", ambiguous periods ("last month", "autumn", "Q3", "October" with no year), subscriptions, FX, refunds, income, cashback, forecasts, anomalies, knowledge (incl. cross-lingual), mixed, export (HITL), out-of-scope, and prompt injection (in user input, in a merchant name, in a transfer comment with a card number and IBAN, and in a document). Each question lists its expected intent, expected tool calls (acceptable names + an argument subset), expected numbers, expected evidence (document + text) and forbidden strings.
+- **Why:** each expectation becomes a metric that code can check, so most of the eval needs no LLM opinion at all. Argument *subsets* and lists of acceptable tools keep the eval from punishing correct but different solutions.
+- **Lesson from the first run:** the agent searched "the 250 UAH charge on February 20" with `date_from = date_to = 2025-02-20`, which is better than the month I'd expected, and my expectation marked it wrong. Expected arguments must describe what any correct call has to contain, not one particular solution.
+
+## D34. Metrics: code first, LLM judge only for what code can't check
+
+- **Routing accuracy:** intent matches (blocked-by-guardrail counts as "injection").
+- **Tool accuracy:** *name* (an acceptable tool ran successfully) and *name + args* (with the expected argument subset); failed calls don't count.
+- **Numeric correctness:** every expected number appears in the answer, exact or rounded to whole units, parsed with the same number parser as the grounding guardrail. Never judged by an LLM.
+- **Retrieval:** recall@5 and MRR, where a chunk is relevant if it comes from the expected document and contains the expected text. That makes the metric independent of chunk ids, so the two chunking strategies are comparable.
+- **Safety:** refusals where required; forbidden strings (injected claims, PAN, IBAN) absent.
+- **LLM judge** (`eval/judge.py`): faithfulness and helpfulness 1–5 against a rubric, given the same data the composer saw plus the author's reference note. It catches wrong *reasoning* with right numbers (D19). The same judge model is used for every config, so scores are comparable.
+- **Pass:** a question passes only if every applicable code check is perfect. Strict on purpose: "4 of 5 numbers right" is a wrong answer in finance.
+- **Cost and latency:** a LangChain callback (`providers/usage.py`) records tokens per model for every call in a request; cost = tokens × the config's price table. Unknown prices are reported as "n/a", never as $0. The same tracker is meant for the API service (M5).
+- **Known biases:** the judge is a local Qwen judging (among others) Qwen's own answers, a self-preference risk; a stronger, different judge (e.g. Claude Sonnet) is the fix once an API key is available. The dataset is small, so a difference of 1–2 questions between configs is noise.
+
+## D35. RAG ablation runs retrieval only
+
+- **What:** `--ablation` runs every evidence question through {fixed, structure} × {BM25, dense, hybrid, dense+rerank, hybrid+rerank} and reports recall@1/3/5, MRR and latency. No LLM involved.
+- **Why:** retrieval quality can be measured cheaply and deterministically. Mixing it with generation would blur which stage helped.
+
+## D36. Record/replay for CI
+
+- **What:** `--record` stores every model response and retrieval result for the smoke subset in `eval/recordings/*.json` through LangChain's cache hook; `--replay` serves them back and fails on any call that isn't recorded. `tests/test_eval_smoke.py` replays the smoke subset and requires the same verdicts and the same answers as the committed baseline.
+- **Why:** CI can't run a 23 GB model, and paid API calls on every push are slow, flaky and cost money. Replaying the full graph still exercises routing, tools, guardrails, composer checks and metrics, with zero network. A changed prompt shows up as "not recorded", which is a useful signal on its own: re-record and review the new answers.
+- **Security:** recordings are committed files anyone could edit in a PR, so replay deserializes only `ChatGeneration`/`AIMessage` objects (LangChain's `load` with an explicit allowlist), never arbitrary classes.
+- **Trade-offs:** replay tests the code around the model, not the model. Quality regressions are caught by re-running the full eval.
+
+## D37. Provider configs: one YAML per setup, same dataset, same judge
+
+- **What:** `eval/configs/*.yaml` names a model per node (router, agent, composer) plus the judge and a price table. Local: `local-qwen` (Qwen3.6 35B-A3B everywhere), `local-gemma` (Gemma 4 everywhere), `local-mixed` (Gemma routes, Qwen does the rest). API: `anthropic` (Haiku 5.5 routes, Sonnet 5.5 answers; list prices as of 2026-11), `gemini`, `openrouter`. A config whose API key is missing refuses to start with a clear message.
+- **Why:** "small model for routing, larger for answers" is then a measured claim, not a slogan. Claude models get no `temperature` (current models reject non-default sampling); Ollama gets `reasoning=False`.
+- **Gaps:** the Gemini and OpenRouter model ids and prices must be verified before use; I didn't guess prices.
+
+## D38. The eval never touches real data
+
+- **What:** the runner builds its own `Settings` with `mono_token=None` and an in-memory cache, whatever `.env` says.
+- **Why:** results, recordings and the report are committed. A misconfigured machine with a real token must not leak real transactions into the repository.
+
+## D39. Every model call has an output cap and a bounded context
+
+- **What:** Ollama models run with `num_predict=2048` and `num_ctx=32768`; Anthropic with `max_tokens=2048`; every client has a timeout and retries.
+- **Why:** without an output cap, a model that falls into a repetition loop keeps generating until its context is full, and a client timeout doesn't stop it: LangChain streams from Ollama internally, and an inactivity timeout resets with every chunk. So a timeout alone doesn't bound a call; an output cap does. Ollama also loaded Qwen with its full 262k-token context by default (28 GB); our largest prompt is about 12k tokens, and at 32k the model takes 23 GB.
+- **Honest note:** I added this after misreading a slow eval run as a hung one. The run was healthy; its progress lines just weren't visible because Python buffers stdout when piped. The cap is still the right default, and the eval runner now flushes every progress line.
+- **Trade-offs:** an answer longer than 2048 tokens gets cut. That's far above anything this assistant should say. In M5 an overall per-request deadline at the API layer becomes the second safety net.
+
+## D40. Rate-limited questions are "not run", not "wrong"; runs can resume
+
+- **What:** an error caused by a rate limit or the network marks the question as *not run*. It's excluded from the scores and shown as a separate count. `--resume` keeps finished answers and re-runs only those.
+- **Why:** OpenRouter's free tier allows about 50 requests per day. The free Nemotron run hit it at question 12 of 20. Counting those 8 as failures would rank a model on infrastructure, not quality; dropping them silently would hide that the run is incomplete.
+- **Core subset:** free tiers run only `--subset core` (every 4th question, a stratified sample of 20). The report then compares every config on the same 20 questions.
+
+## D41. Fixes driven by the first full eval run (baseline → v2)
+
+The baseline `local-qwen` run passed 55 of 77 questions (71%). Reading every failure, not just the score, sorted them into three kinds:
+
+- **The dataset was wrong (3).** Correct answers reached by valid but different routes were marked as failures: comparing all categories instead of one, querying Nov 20–30 instead of all of November. "Скільки кешбеку я отримав у жовтні" is genuinely ambiguous (earned on October purchases vs paid out in October). Fixes: looser argument subsets, and an `any:` list of acceptable values for ambiguous numbers. `--rescore` re-scores stored answers against the corrected dataset without new model calls: the baseline moved from 71% to 73% on fairness alone.
+- **Tool design bugs (found by real failures).** 1) `category=jars` + `kind=spending` silently returned nothing, and the answer said "you put 0 UAH into jars". Contradictory filters are now a validation error with a hint (`kind=all`). 2) Rent is a transfer whose *comment* says «Оренда квартири»; search covered only the description. The filter is now `text` and searches both. 3) SQLite `LIKE` folds case only for ASCII, so «оренда» never matched «Оренда»: replaced by a Python `casefold` function registered in SQLite. 4) "Which purchases were refunded" had no filter: `kind=refunds` added.
+- **Prompt gaps.** The router sent currency rates and subscription prices to `out_of_scope`/`knowledge`, and savings forecasts to `mixed`. Its prompt now lists explicitly what counts as the user's own data (rates, subscriptions, forecasts, "why" questions). The agent prompt now says: always call a tool, money moves (`transfers`/`jars`/`currency_exchange`/`cashback`) are queried with `kind=all`, cashback earned lives in `aggregate_spending`, and bank texts are Ukrainian.
+- **Overfitting caveat:** the fixes were found on the same 77 questions they are measured on, so v2's gain is optimistic. I kept the fixes general (tool semantics, a category list in the router) rather than question-specific wording. The proper next step is a held-out set written after these fixes.
+- **Checkpointing:** the runner saves results after every question, so any interruption (rate limit, crash, a laptop going to sleep) costs one question, not the whole run. Learned the hard way: a 77-question local run on a laptop on battery with the lid closed advanced only during macOS maintenance wake-ups, about one model call every 17–30 minutes. `caffeinate -i` prevents idle sleep, not closed-lid sleep on battery. Long local evals need AC power and an open lid. The latency numbers survive a sleep: `time.perf_counter()` on macOS doesn't advance while the machine sleeps, so the measured times count only time awake (checked: the slowest question in that run took 125 s of real compute). `--resume --only <ids>` re-runs single questions when needed.
+
+## D42. What the eval says (v2, synthetic data, placeholder docs)
+
+Full numbers: `eval/report.md`. Read with the caveats in D34 (small dataset; Qwen judges itself) and D41 (fixes measured on the same questions).
+
+- **Best setup: Gemma 4 routes, Qwen3.6 does the rest: 91% pass** (Qwen alone 87%, Gemma alone 82%). Gemma routes better (94% vs 91%) but makes more tool and number mistakes (81% numbers vs 93%). Qwen is the better tool caller but sends too many questions to `mixed`. Per-node model choice (D21) pays off: this is the "small model for routing, larger for answers" idea, except the measured winner isn't the smaller one, it's the one that routes better.
+- **Code-checked safety holds: 100% on all 12 safety questions in every config** (out of scope, injection in input, merchant names, comments and documents, PAN/IBAN never leaked). That comes from code (D18, D10), not from model behaviour, which is why it doesn't vary by model.
+- **Where it still fails:** over-routing to `mixed` (an extra retrieval step: slower and more tokens; the eval counts it as a routing error even when the answer is right), questions that need summing across several transactions (salary raise, ChatGPT in USD), and mixed questions (40–60%). Next fixes would be a few-shot router prompt and a tool that sums cashback by category for a period.
+- **Free API model:** Nemotron 3 Ultra (OpenRouter free tier) passed 10 of the 12 core questions it could run before the daily cap: on par with the local models, at about twice the latency (27 s vs 13 s per question). Free tiers fit quick comparisons, not a full eval.
+- **Cost:** $0 for all configs run (local or free tier). The cost column and price tables are wired (D34), so a paid config (Anthropic) fills it with real numbers once a key is set.
+- **RAG ablation:** with structure-aware chunks, dense retrieval alone already reaches 100% recall@3 and MRR 0.90. Hybrid without the reranker is *worse* (MRR 0.65): BM25 finds nothing for English questions about Ukrainian documents and drags good dense results down in the fusion. The reranker fixes that, but adds no gain over dense alone on this corpus. Structure-aware beats fixed-size on MRR (0.90 vs 0.85) and recall@1 (81% vs 76%). Decision: keep the default `structure` + `hybrid` + `rerank`. It equals dense here, and BM25's strength (exact terms like product codes and numbers) only shows on a bigger, real corpus. Re-run the ablation when the real tariff documents are added; if dense still wins, switch the default to dense and skip ~250 ms of reranking per question. (The 237 ms for the first fixed/dense row includes model warm-up.)
