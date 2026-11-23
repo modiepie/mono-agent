@@ -32,6 +32,20 @@ def index_docs(settings: Settings, strategies: list[Strategy]) -> dict[str, int]
     return counts
 
 
+def ensure_index(settings: Settings) -> None:
+    """Index data/docs on first start if Qdrant is up and the collection is missing, so a
+    fresh `docker compose up` works without a separate indexing step."""
+    name = collection_name(settings.chunking, settings.embeddings)
+    try:
+        if QdrantClient(settings.qdrant_url, timeout=5).collection_exists(name):
+            return
+    except Exception as exc:
+        log.warning("Qdrant unavailable at %s: %s", settings.qdrant_url, exc)
+        return
+    log.info("indexing %s into %s", settings.docs_dir, name)
+    index_docs(settings, [settings.chunking])
+
+
 def build_retriever(settings: Settings) -> Retriever | None:
     """None if Qdrant is down or the index is missing: the assistant still answers
     transaction questions and says it has no documents for the rest."""

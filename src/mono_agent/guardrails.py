@@ -91,6 +91,10 @@ def numbers_in(obj: Any) -> set[float]:
     return found
 
 
+# Dates are not amounts: "09.06.2025" would otherwise parse as 9.06 and be flagged.
+_DATES = re.compile(r"\b\d{1,2}[./]\d{1,2}[./]\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b")
+
+
 def ungrounded_numbers(answer: str, allowed: Iterable[float]) -> list[float]:
     """Numbers in the answer that no tool result (or the question) supports.
 
@@ -99,7 +103,7 @@ def ungrounded_numbers(answer: str, allowed: Iterable[float]) -> list[float]:
     """
     allowed_abs = {abs(a) for a in allowed}
     bad = []
-    for n in parse_numbers(answer):
+    for n in parse_numbers(_DATES.sub(" ", answer)):
         n = abs(n)
         # shortcut: small integers (counts, day numbers, "3 months") pass unchecked; a count
         # the model got wrong is caught by the eval's exact-answer checks, not here.

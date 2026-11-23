@@ -88,3 +88,10 @@ NO_KNOWLEDGE = "No relevant documents found."
 STANDALONE_QUERY = """Rewrite the user's latest message as a standalone search query about
 monobank products and terms, using the conversation for context. Keep the user's language.
 Reply with the query only."""
+
+EXPORT_DONE = """
+The report was saved to a file; the system shows the user its path. Say so in one short
+sentence. Do not say that you cannot save files."""
+
+EXPORT_DECLINED = """
+The user chose not to save the report. Answer the question without mentioning a file."""

@@ -63,3 +63,7 @@ def test_grounding_accepts_rounding_and_sign_and_flags_invented():
     assert ungrounded_numbers("charge of 250 UAH", allowed) == []
     assert ungrounded_numbers("about 7000 UAH", allowed) == [7000.0]
     assert ungrounded_numbers("3 subscriptions in 12 months", allowed) == []
+
+
+def test_dates_are_not_checked_as_amounts():
+    assert ungrounded_numbers("останнє списання 09.06.2025, на 2025-10-03", {199.0}) == []

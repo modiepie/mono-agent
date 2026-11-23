@@ -11,3 +11,8 @@ def test_token_never_in_repr(monkeypatch):
     s = Settings(_env_file=None)  # type: ignore[call-arg]
     assert s.use_real_api
     assert "super-secret" not in repr(s)
+
+
+def test_empty_token_means_synthetic_mode(monkeypatch):
+    monkeypatch.setenv("MONO_TOKEN", "")
+    assert not Settings(_env_file=None).use_real_api  # type: ignore[call-arg]

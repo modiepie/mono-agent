@@ -4,7 +4,7 @@ from datetime import date
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LOCAL_MODEL = "ollama:qwen3.6:35b-a3b-q4_K_M"
@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     router_model: str = LOCAL_MODEL
     agent_model: str = LOCAL_MODEL
     composer_model: str = LOCAL_MODEL
+    # Used when the primary model of a node fails (timeout, rate limit, provider down).
+    # Empty = no fallback. Example: "openrouter:nvidia/nemotron-3-ultra-550b-a55b:free".
+    fallback_model: str = ""
 
     # Retrieval (each stage switchable for the eval's ablation).
     qdrant_url: str = "http://localhost:6333"
@@ -36,6 +39,23 @@ class Settings(BaseSettings):
     retrieval_mode: Literal["dense", "bm25", "hybrid"] = "hybrid"
     rerank: bool = True
     top_k: int = 5
+
+    # Service
+    log_level: str = "INFO"
+    # Tracing is on when both keys are set (self-hosted Langfuse in docker compose, or cloud).
+    langfuse_public_key: str = ""
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_base_url: str = "http://localhost:3000"
+
+    @field_validator("mono_token", "langfuse_secret_key", mode="before")
+    @classmethod
+    def _blank_is_none(cls, v: object) -> object:
+        # `MONO_TOKEN=` (as in .env.example) means "not set", not "an empty token".
+        return None if isinstance(v, str) and not v.strip() else v
+
+    @property
+    def tracing_enabled(self) -> bool:
+        return bool(self.langfuse_public_key and self.langfuse_secret_key)
 
     @property
     def use_real_api(self) -> bool:

@@ -24,6 +24,7 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
+from langchain_core.runnables import Runnable
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Checkpointer, interrupt
 
@@ -35,6 +36,11 @@ from mono_agent.tools.finance import ToolContext
 
 MAX_AGENT_STEPS = 8  # tool-calling rounds per turn; stops runaway ReAct loops
 HISTORY = 6  # previous messages shown to router/agent: enough for follow-ups, cheap
+# Models sometimes cite tool calls ("[detect_subscriptions]", "[07607e32-...]"): internal
+# noise for a user. Document citations ("[credit-limit#2]") are kept.
+_INTERNAL_REFS = re.compile(
+    r"\s?\[(?:" + "|".join(TOOLS) + r"|[0-9a-f]{8}-[0-9a-f-]{27,}|call_\w+)\]"
+)
 _CITE = re.compile(r"\[([\w.-]+#\d+)\]")
 
 # query -> retrieved chunks as dicts (id, doc_id, title, section, date, sample, text, score)
@@ -46,6 +52,12 @@ class Models:
     router: BaseChatModel
     agent: BaseChatModel
     composer: BaseChatModel
+    fallback: BaseChatModel | None = None  # used by every node when its own model fails
+
+
+def _with_fallback(primary: Runnable, backup: Runnable | None) -> Runnable:
+    """Retry the same call on the backup model if the primary raises (timeout, 429, 5xx)."""
+    return primary.with_fallbacks([backup]) if backup is not None else primary
 
 
 def lang(text: str) -> str:
@@ -71,8 +83,19 @@ class Nodes:
         self.retrieve = retrieve
         self.ctx = ctx
         self.export_dir = export_dir
-        self.agent_llm = models.agent.bind_tools([t.schema() for t in TOOLS.values()])
-        self.router_llm = models.router.with_structured_output(RouterDecision)
+        # Each use is bound (tools, schema) before adding the fallback: a fallback must be
+        # bound the same way, or it would answer without tools.
+        schemas = [t.schema() for t in TOOLS.values()]
+        fb = models.fallback
+        self.agent_llm = _with_fallback(
+            models.agent.bind_tools(schemas), fb.bind_tools(schemas) if fb else None
+        )
+        self.router_llm = _with_fallback(
+            models.router.with_structured_output(RouterDecision),
+            fb.with_structured_output(RouterDecision) if fb else None,
+        )
+        self.composer_llm = _with_fallback(models.composer, fb)
+        self.rewrite_llm = _with_fallback(models.router, fb)
 
     def guardrail(self, state: AgentState) -> dict:
         """Start of a turn: reset per-turn state, block injection attempts in the user input."""
@@ -142,7 +165,7 @@ class Nodes:
         query = _question(state)
         if len(_history(state)) > 1:
             system = SystemMessage(prompts.STANDALONE_QUERY)
-            query = str(self.models.router.invoke([system, *_history(state)]).content).strip()
+            query = str(self.rewrite_llm.invoke([system, *_history(state)]).content).strip()
         update["retrieved_docs"] = self.retrieve(query)
         return update
 
@@ -187,21 +210,26 @@ class Nodes:
                 documents=docs_text,
             )
         )
+        if state.get("intent") == "export":
+            # Only on export turns, so every other prompt stays unchanged.
+            note = prompts.EXPORT_DONE if state.get("export_path") else prompts.EXPORT_DECLINED
+            system = SystemMessage(str(system.content) + "\n" + note)
         convo = [system, *_history(state)]
-        answer = str(self.models.composer.invoke(convo).content)
+        answer = str(self.composer_llm.invoke(convo).content)
 
         # Every number in the answer must come from tool results, their arguments, the
         # question or today's date. One retry with feedback, then a visible warning.
         allowed = numbers_in([compact, docs, question, str(self.ctx.today)])
         if bad := ungrounded_numbers(answer, allowed):
             fix = HumanMessage(prompts.FIX_NUMBERS.format(numbers=", ".join(map(str, bad))))
-            answer = str(self.models.composer.invoke([*convo, AIMessage(answer), fix]).content)
+            answer = str(self.composer_llm.invoke([*convo, AIMessage(answer), fix]).content)
             if ungrounded_numbers(answer, allowed):
                 answer += (
                     "\n\n⚠️ Деякі числа не вдалося перевірити."
                     if lang(question) == "uk"
                     else "\n\n⚠️ Some numbers could not be verified."
                 )
+        answer = _INTERNAL_REFS.sub("", answer)
         if state.get("export_path"):
             answer += f"\n\n📄 {state['export_path']}"
         if any(r["tool"] == "forecast_savings" for r in results):

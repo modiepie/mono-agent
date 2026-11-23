@@ -21,6 +21,7 @@ def models_from(settings: Settings) -> Models:
         router=chat_model(settings.router_model),
         agent=chat_model(settings.agent_model),
         composer=chat_model(settings.composer_model),
+        fallback=chat_model(settings.fallback_model) if settings.fallback_model else None,
     )
 
 

@@ -5,7 +5,9 @@ __pycache__/
 .ruff_cache/
 .env
 # Local caches and any real bank data stay out of git.
-data/*.sqlite
+# incl. SQLite -wal/-shm side files: checkpoints can hold real data
+data/*.sqlite*
 data/real/
 *.sqlite-journal
 data/exports/
+.claude/

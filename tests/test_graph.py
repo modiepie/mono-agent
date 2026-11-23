@@ -141,7 +141,7 @@ def test_export_waits_for_confirmation_and_writes_only_on_yes(ctx, tmp_path):
         agent=[tool_call("aggregate_spending", OCT_TAXI), AIMessage("done")] * 2,
         composer=[AIMessage("Report ready: 5 864 UAH."), AIMessage("Not exported.")],
     )
-    graph, _ = make(ctx, tmp_path, **script)
+    graph, models = make(ctx, tmp_path, **script)
     config: RunnableConfig = {"configurable": {"thread_id": "e"}}
 
     paused = graph.invoke({"messages": [HumanMessage("Export my October taxi report")]}, config)
@@ -150,6 +150,7 @@ def test_export_waits_for_confirmation_and_writes_only_on_yes(ctx, tmp_path):
 
     done = graph.invoke(Command(resume=True), config)
     report = Path(done["export_path"])
+    assert "report was saved" in str(models.composer.prompts[0][0].content)  # type: ignore[attr-defined]
     assert report.exists() and "aggregate_spending" in report.read_text()
 
     graph.invoke({"messages": [HumanMessage("Export it again")]}, config)
@@ -259,3 +260,43 @@ def test_no_retriever_means_composer_is_told_there_are_no_documents(ctx, tmp_pat
     )
     ask(graph, "What is the cashback limit?")
     assert "No relevant documents found." in str(models.composer.prompts[0][0].content)  # type: ignore[attr-defined]
+
+
+class Failing(Scripted):
+    def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+        raise TimeoutError("primary model down")
+
+
+def test_fallback_model_takes_over_when_primary_fails(ctx, tmp_path):
+    models = Models(
+        router=Failing(),
+        agent=Failing(),
+        composer=Failing(),
+        fallback=Scripted(
+            replies=[
+                route("transactions", ["transactions"]),
+                tool_call("aggregate_spending", OCT_TAXI),
+                AIMessage("done"),
+                AIMessage("5 864 UAH on taxis."),
+            ]
+        ),
+    )
+    graph = build_graph(models, ctx, tmp_path, InMemorySaver())
+    out = ask(graph, "taxi in October?")
+    assert out["messages"][-1].content == "5 864 UAH on taxis."
+    assert [r["tool"] for r in out["tool_results"]] == ["aggregate_spending"]
+
+
+def test_tool_citations_are_removed_but_document_citations_kept(ctx, tmp_path):
+    graph, _ = make(
+        ctx,
+        tmp_path,
+        router=[route("mixed", ["transactions", "knowledge"])],
+        agent=[tool_call("aggregate_spending", OCT_TAXI), AIMessage("done")],
+        composer=[
+            AIMessage("Таксі 5 864 грн [aggregate_spending] [c1]. До 62 днів [credit-limit#2].")
+        ],
+        retrieve=lambda q: [GRACE],
+    )
+    out = ask(graph, "taxi and grace period?")
+    assert out["messages"][-1].content == "Таксі 5 864 грн [c1]. До 62 днів [credit-limit#2]."
