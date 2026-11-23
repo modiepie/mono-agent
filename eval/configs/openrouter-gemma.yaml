@@ -1,0 +1,8 @@
+name: openrouter-gemma
+description: Google Gemma 4 31B (free tier on OpenRouter) on every node
+router: openrouter:google/gemma-4-31b-it:free
+agent: openrouter:google/gemma-4-31b-it:free
+composer: openrouter:google/gemma-4-31b-it:free
+judge: ollama:qwen3.6:35b-a3b-q4_K_M
+prices:
+  google/gemma-4-31b-it:free: [0, 0]

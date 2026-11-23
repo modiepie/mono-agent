@@ -1,0 +1,6 @@
+name: local-gemma
+description: Gemma 4 via Ollama on every node
+router: ollama:gemma4:latest
+agent: ollama:gemma4:latest
+composer: ollama:gemma4:latest
+judge: ollama:qwen3.6:35b-a3b-q4_K_M

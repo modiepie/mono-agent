@@ -1,0 +1,7 @@
+name: gemini
+description: Gemini Flash on every node (verify the model id before running)
+router: google_genai:gemini-2.5-flash
+agent: google_genai:gemini-2.5-flash
+composer: google_genai:gemini-2.5-flash
+judge: ollama:qwen3.6:35b-a3b-q4_K_M
+prices: {}  # fill in current prices, otherwise cost is reported as n/a

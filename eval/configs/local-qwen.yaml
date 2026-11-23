@@ -1,0 +1,6 @@
+name: local-qwen
+description: Qwen3.6 35B-A3B (MoE, ~3B active) via Ollama on every node
+router: ollama:qwen3.6:35b-a3b-q4_K_M
+agent: ollama:qwen3.6:35b-a3b-q4_K_M
+composer: ollama:qwen3.6:35b-a3b-q4_K_M
+judge: ollama:qwen3.6:35b-a3b-q4_K_M   # same judge in every config, so scores are comparable

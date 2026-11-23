@@ -1,0 +1,9 @@
+name: anthropic
+description: Claude Haiku 5.5 routes, Claude Sonnet 5.5 calls tools and answers
+router: anthropic:claude-haiku-5-5
+agent: anthropic:claude-sonnet-5-5
+composer: anthropic:claude-sonnet-5-5
+judge: ollama:qwen3.6:35b-a3b-q4_K_M
+prices:  # USD per 1M tokens [input, output]; Anthropic list prices as of 2026-11
+  claude-haiku-5-5: [0.10, 0.50]
+  claude-sonnet-5-5: [2.00, 10.00]

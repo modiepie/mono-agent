@@ -1,0 +1,6 @@
+name: local-mixed
+description: Gemma 4 routes, Qwen3.6 does tool calls and answers
+router: ollama:gemma4:latest
+agent: ollama:qwen3.6:35b-a3b-q4_K_M
+composer: ollama:qwen3.6:35b-a3b-q4_K_M
+judge: ollama:qwen3.6:35b-a3b-q4_K_M
