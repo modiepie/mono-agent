@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.4.0  # exact: setup-uv publishes no moving major tag
         with:
           enable-cache: true
       # Python version from .python-version; torch from the CPU-only index (pyproject).
