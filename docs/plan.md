@@ -27,7 +27,8 @@ docs/                # plan.md, decisions.md, interview-notes.md
 
 - M1–M3 done. M4 done: 77-question eval, provider comparison, RAG ablation, CI replay ([eval/report.md](../eval/report.md)).
 - M5 done: FastAPI SSE service, Ukrainian Streamlit UI, provider fallbacks, JSON logs, self-hosted Langfuse v4, Docker Compose, GitHub Actions.
-- Next: M6 (README with demo GIF, architecture diagram, results; interview notes).
+- M6 done: README (demo GIF, diagrams, results, 3-command quickstart), interview notes, decisions index.
+- Next: M7 stretch (QLoRA router vs prompting; MCP server for the tools).
 
 ## Milestones
 
