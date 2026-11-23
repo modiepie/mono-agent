@@ -3,6 +3,7 @@
 import argparse
 import uuid
 
+from dotenv import load_dotenv
 from langgraph.types import Command
 
 from mono_agent.app import build_app
@@ -23,6 +24,7 @@ def run_turn(app, question: str, thread: str) -> str:
 
 
 def main() -> None:
+    load_dotenv()  # provider SDKs read API keys from the environment
     parser = argparse.ArgumentParser(prog="mono-agent")
     sub = parser.add_subparsers(dest="cmd", required=True)
     ask = sub.add_parser("ask", help="ask one question")
