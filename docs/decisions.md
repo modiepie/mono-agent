@@ -283,3 +283,62 @@ Full numbers: `eval/report.md`. Read with the caveats in D34 (small dataset; Qwe
 - **Free API model:** Nemotron 3 Ultra (OpenRouter free tier) passed 10 of the 12 core questions it could run before the daily cap: on par with the local models, at about twice the latency (27 s vs 13 s per question). Free tiers fit quick comparisons, not a full eval.
 - **Cost:** $0 for all configs run (local or free tier). The cost column and price tables are wired (D34), so a paid config (Anthropic) fills it with real numbers once a key is set.
 - **RAG ablation:** with structure-aware chunks, dense retrieval alone already reaches 100% recall@3 and MRR 0.90. Hybrid without the reranker is *worse* (MRR 0.65): BM25 finds nothing for English questions about Ukrainian documents and drags good dense results down in the fusion. The reranker fixes that, but adds no gain over dense alone on this corpus. Structure-aware beats fixed-size on MRR (0.90 vs 0.85) and recall@1 (81% vs 76%). Decision: keep the default `structure` + `hybrid` + `rerank`. It equals dense here, and BM25's strength (exact terms like product codes and numbers) only shows on a bigger, real corpus. Re-run the ablation when the real tariff documents are added; if dense still wins, switch the default to dense and skip ~250 ms of reranking per question. (The 237 ms for the first fixed/dense row includes model warm-up.)
+
+## D43. API: Server-Sent Events with progress, the answer only after checks
+
+- **What:** FastAPI. `POST /chat` streams SSE events: `thread` (id), `step` per finished graph node (router decision, each tool call with its arguments, retrieved chunk ids), then `answer` (text, citations, tool calls, documents) or `confirm` (graph paused) or `error`. `POST /chat/{thread_id}/resume {"approve": bool}` continues a paused export; resuming a thread with nothing to confirm is a 409. Input is validated (message 1–2000 chars, thread id `[A-Za-z0-9_-]{1,64}`).
+- **Why progress, not tokens:** the composer's draft can fail the number check (D19) and be rewritten. Streaming its tokens would show the user text that is then withdrawn. Progress events give the same "it's working" feedback, and each one is something real (e.g. "querying data: spending totals"). SSE rather than WebSockets: one-way, plain HTTP, works through proxies, trivial to consume.
+- **Errors:** any exception becomes an `error` event with a generic message; details go to the log, never to the client.
+
+## D44. The graph runs in a worker thread, not inside the HTTP response
+
+- **What:** each request starts a thread that runs the graph and puts SSE events in a queue; the response just reads the queue. A lock allows one graph run at a time.
+- **Why (bug found by live testing):** first version held the lock inside the streaming generator. Streamlit reruns the page on every click, which abandons the open stream; uvicorn doesn't close a sync generator when the client disconnects, so the lock stayed held and every later request hung. Unit tests didn't catch it (the test client closes generators properly); a manual test against the container did, and the same test proves the fix: after an abandoned stream, the next request answers. With the worker thread, a disconnect just stops reading; the run still finishes, saves its checkpoint and releases the lock.
+- **Trade-offs:** one run at a time is fine for a single user, and a local model serves one request at a time anyway. For several users: a connection per request (or Postgres) instead of shared SQLite connections, and a task queue. This is marked as a `shortcut:` in code.
+
+## D45. Provider fallbacks per node
+
+- **What:** `FALLBACK_MODEL` (any `provider:model`) is wrapped around every model use with LangChain's `with_fallbacks`: the tool-bound agent, the structured-output router, the composer and the query rewriter.
+- **Why:** a provider timeout, 429 or outage shouldn't fail the user's question. The fallback must be bound the same way as the primary (tools, output schema), so the wrapping happens after `bind_tools`/`with_structured_output`, not on the bare model. A test makes every primary model fail and checks that the fallback finishes the whole question.
+- **Trade-offs:** the fallback may be weaker (e.g. a free OpenRouter model), so a degraded answer beats no answer. Cost tracking records which model actually ran.
+
+## D46. Structured logging to stdout
+
+- **What:** one JSON object per log line (`ts`, `level`, `logger`, `msg`, plus fields). Every chat request logs thread id, status, latency, call count and tokens.
+- **Why:** stdlib `logging` with a 20-line formatter: no dependency, grep-able locally, ready for any log shipper. stdout is the container convention. Traces (Langfuse) answer "what happened inside this request"; logs answer "what happened to all requests".
+
+## D47. Langfuse v4, self-hosted, optional
+
+- **What:** `docker compose --profile tracing up -d` adds Langfuse (web, worker, Postgres, ClickHouse, Redis, MinIO), trimmed from the official v4 compose file (the AI gateway is left out). Headless init creates the org, project, admin user and API keys on first start. When `LANGFUSE_PUBLIC_KEY`/`SECRET_KEY` are set, the API adds Langfuse's LangChain `CallbackHandler` to every run, with `langfuse_session_id` = thread id, and flushes on shutdown.
+- **Why:** self-hosted keeps financial traces on the machine. A profile keeps the default stack light (Langfuse alone is six containers). Every port binds to `127.0.0.1`; the default secrets are labelled local-only.
+- **What it showed immediately:** a trace of one knowledge question in Docker: router 0.7 s, retrieval 5.4 s, composer 8.9 s. Retrieval is slow in the container because Docker on macOS has no GPU, so embeddings and the reranker run on CPU (on the host they use the GPU). A production deployment would serve embeddings from a GPU service or use an API embedding model.
+- **Version note:** Langfuse moved to v4 during this project; v4 dropped the `GET /api/public/traces` listing (ingestion is OpenTelemetry-based), so trace checks go through the UI or the v4 APIs.
+
+## D48. Streamlit UI, all text in Ukrainian, talking only to the API
+
+- **What:** chat with live progress ("Звертаюся до даних: підсумки витрат"), the answer, an expander "Як отримано відповідь" (tool calls, sources, a note on sample documents), export confirmation buttons, a sidebar with data mode, models and tracing status, and example questions.
+- **Why Streamlit:** a chat UI in ~180 lines of Python that I can explain fully; Chainlit's maintenance moved to the community in 2025. The UI calls the HTTP API only, so it has no access to data or secrets and could be replaced by a web or mobile client without touching the agent.
+- **Language:** every interface string is Ukrainian; a test scans the UI's user-facing strings for Latin-only words. Streamlit's own developer toolbar is hidden; its small running indicator ("Stop") is framework chrome I can't translate without a custom frontend.
+- **Detail:** the confirmation buttons use `on_click` callbacks, which run before the page is redrawn, so the buttons disappear right after a click and the choice appears in the chat history.
+
+## D49. Docker: one image, CPU PyTorch, models from the host
+
+- **What:** one image for API and UI (different commands). On Linux, PyTorch comes from the CPU-only index via `[tool.uv.sources]`; that only applies to direct dependencies, so `torch` is listed explicitly with a comment saying why. The uv cache is a BuildKit cache mount (fast rebuilds, not baked into the image); the app runs as a non-root user. The image is about 2.2 GB, mostly PyTorch.
+- **Models:** LLMs run in Ollama on the host (`host.docker.internal`): containers on macOS can't use the Apple GPU, and a 23 GB model inside the image would make no sense. Embedding/reranker weights come from the host's Hugging Face cache via a volume.
+- **First start:** the API indexes `data/docs` into Qdrant if the collection is missing, so `docker compose up` works without a separate setup step.
+- **Safety:** `MONO_TOKEN` is passed explicitly, so `MONO_TOKEN= docker compose up` forces synthetic data even when `.env` holds a real token. The Langfuse port is configurable (`LANGFUSE_PORT`); 3000 was already taken on my machine.
+
+## D50. CI: GitHub Actions, no network, no models
+
+- **What:** on every push/PR: `uv sync --frozen`, `ruff format --check`, `ruff check`, `pyright`, `pytest`. The tests include the API (scripted models), the UI (Streamlit `AppTest`) and the eval smoke subset replayed from recordings (D36), so the full graph runs in CI without Ollama, Qdrant or API keys.
+- **Not yet run:** the repository has no GitHub remote yet; the workflow runs once it's pushed.
+
+## D51. Bugs found only by running the system for real
+
+Unit tests passed for all of these; using the system end to end didn't:
+
+- **Empty token = real mode.** `MONO_TOKEN=` (as in `.env.example`) became an empty `SecretStr`, not `None`, so a fresh setup ran in real mode with an empty token. Blank values are now treated as unset (with a test).
+- **Dates checked as amounts.** "09.06.2025" parsed as 9.06 and triggered "some numbers could not be verified". Dates are now removed before the number check.
+- **Internal ids in answers.** The model cited tool names and tool-call UUIDs; those are stripped in code, document citations are kept.
+- **"I can't save files"** right after the export saved one: the composer was never told the export's outcome. It is now, but only on export turns, so other prompts (and the CI recording) are unchanged.
+- **The deadlock** in D44.

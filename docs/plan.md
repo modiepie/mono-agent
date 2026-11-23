@@ -26,7 +26,8 @@ docs/                # plan.md, decisions.md, interview-notes.md
 ## Status
 
 - M1–M3 done. M4 done: 77-question eval, provider comparison, RAG ablation, CI replay ([eval/report.md](../eval/report.md)).
-- Next: M5 (FastAPI streaming service, Ukrainian-language UI, Langfuse, Docker Compose, GitHub Actions).
+- M5 done: FastAPI SSE service, Ukrainian Streamlit UI, provider fallbacks, JSON logs, self-hosted Langfuse v4, Docker Compose, GitHub Actions.
+- Next: M6 (README with demo GIF, architecture diagram, results; interview notes).
 
 ## Milestones
 
