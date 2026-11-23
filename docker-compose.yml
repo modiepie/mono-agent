@@ -1,10 +1,193 @@
+# docker compose up -d                      -> API :8000, UI :8501, Qdrant
+# docker compose --profile tracing up -d    -> + self-hosted Langfuse :3000 (LANGFUSE_PORT)
+#
+# Models run in Ollama on the host (fast on Apple silicon GPU; containers on macOS have no GPU).
+# Every port binds to 127.0.0.1: nothing here is meant to be reachable from other machines.
+
+x-app: &app
+  build: .
+  image: mono-agent:latest  # one image for api and ui
+  env_file:
+    - path: .env
+      required: false
+  environment: &app-env
+    QDRANT_URL: http://qdrant:6333
+    OLLAMA_HOST: http://host.docker.internal:11434
+    DATA_DIR: /app/state
+    LANGFUSE_BASE_URL: http://langfuse-web:3000
+    # Explicit so a shell variable can override .env, e.g. `MONO_TOKEN= docker compose up`
+    # runs the containers on synthetic data even when .env holds a real token.
+    MONO_TOKEN: ${MONO_TOKEN:-}
+    LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-}
+    LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-}
+  extra_hosts:
+    - host.docker.internal:host-gateway  # needed on Linux; Docker Desktop has it built in
+  restart: unless-stopped
+
 services:
+  api:
+    <<: *app
+    command: ["mono-agent-api"]
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - app_state:/app/state  # SQLite cache, conversation checkpoints, exports
+      - ${HOME}/.cache/huggingface:/home/app/.cache/huggingface  # reuse downloaded models
+    depends_on: [qdrant]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 30  # first start loads ~4.5 GB of embedding/reranker weights
+      start_period: 30s
+
+  ui:
+    <<: *app
+    command: ["streamlit", "run", "src/mono_agent/service/ui.py",
+              "--server.port", "8501", "--server.address", "0.0.0.0", "--server.headless", "true"]
+    ports: ["127.0.0.1:8501:8501"]
+    environment:
+      <<: *app-env
+      API_URL: http://api:8000
+    depends_on:
+      api: {condition: service_healthy}
+
   qdrant:
     image: qdrant/qdrant:v1.20.0
-    ports:
-      - "6333:6333"
+    ports: ["127.0.0.1:6333:6333"]
+    volumes: [qdrant_data:/qdrant/storage]
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------- Langfuse (profile: tracing)
+  # Trimmed from the official langfuse/langfuse docker-compose.yml (v4): web, worker and their
+  # stores; the optional AI gateway is left out. Secrets below are local-only defaults: set
+  # real values in .env before exposing this anywhere. The project and its API keys are
+  # created on first start (headless init), so the app's LANGFUSE_PUBLIC_KEY/SECRET_KEY must
+  # match LANGFUSE_INIT_PROJECT_*.
+  langfuse-worker:
+    profiles: [tracing]
+    image: docker.langfuse.com/langfuse/langfuse-worker:${LANGFUSE_IMAGE_TAG:-4}
+    restart: unless-stopped
+    depends_on: &langfuse-deps
+      postgres: {condition: service_healthy}
+      minio: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      clickhouse: {condition: service_healthy}
+    environment: &langfuse-env
+      NEXTAUTH_URL: http://localhost:${LANGFUSE_PORT:-3000}  # must match the browser URL
+      DATABASE_URL: postgresql://postgres:${LANGFUSE_DB_PASSWORD:-postgres}@postgres:5432/postgres
+      SALT: ${LANGFUSE_SALT:-local-only-salt}
+      ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+      TELEMETRY_ENABLED: "false"
+      CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+      CLICKHOUSE_URL: http://clickhouse:8123
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:-clickhouse}
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:-miniosecret}
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LANGFUSE_MINIO_PASSWORD:-miniosecret}
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_AUTH: ${LANGFUSE_REDIS_PASSWORD:-myredissecret}
+
+  langfuse-web:
+    profiles: [tracing]
+    image: docker.langfuse.com/langfuse/langfuse:${LANGFUSE_IMAGE_TAG:-4}
+    restart: unless-stopped
+    depends_on: *langfuse-deps
+    ports: ["127.0.0.1:${LANGFUSE_PORT:-3000}:3000"]  # LANGFUSE_PORT if 3000 is taken
+    environment:
+      <<: *langfuse-env
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-local-only-nextauth-secret}
+      LANGFUSE_INIT_ORG_ID: mono-agent
+      LANGFUSE_INIT_ORG_NAME: mono-agent
+      LANGFUSE_INIT_PROJECT_ID: mono-agent
+      LANGFUSE_INIT_PROJECT_NAME: mono-agent
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-pk-lf-local}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-sk-lf-local}
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_ADMIN_EMAIL:-admin@mono-agent.test}
+      LANGFUSE_INIT_USER_NAME: admin
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_ADMIN_PASSWORD:-local-only-password}
+
+  clickhouse:
+    profiles: [tracing]
+    image: docker.io/clickhouse/clickhouse-server:26.3.62.3
+    restart: unless-stopped
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: ${LANGFUSE_CLICKHOUSE_PASSWORD:-clickhouse}
     volumes:
-      - qdrant_data:/qdrant/storage
+      - langfuse_clickhouse_data:/var/lib/clickhouse
+      - langfuse_clickhouse_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    profiles: [tracing]
+    image: cgr.dev/chainguard/minio
+    restart: unless-stopped
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: ${LANGFUSE_MINIO_PASSWORD:-miniosecret}
+    volumes: [langfuse_minio_data:/data]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    profiles: [tracing]
+    image: docker.io/redis:7
+    restart: unless-stopped
+    command: --requirepass ${LANGFUSE_REDIS_PASSWORD:-myredissecret} --maxmemory-policy noeviction
+    volumes: [langfuse_redis_data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${LANGFUSE_REDIS_PASSWORD:-myredissecret}", "ping"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+
+  postgres:
+    profiles: [tracing]
+    image: docker.io/postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LANGFUSE_DB_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+      TZ: UTC
+      PGTZ: UTC
+    volumes: [langfuse_postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
 
 volumes:
+  app_state:
   qdrant_data:
+  langfuse_postgres_data:
+  langfuse_clickhouse_data:
+  langfuse_clickhouse_logs:
+  langfuse_minio_data:
+  langfuse_redis_data:
