@@ -64,7 +64,9 @@ assert set(CATEGORIES) == {*_MCC, "other", *NON_SPENDING}, "category list out of
 
 
 def category(mcc: int, description: str) -> Category:
-    if mcc == 4829:  # "money transfer": split by what monobank writes in the description
+    # 4829 "money transfer"; 6012 is what real statements use for transfers from another
+    # bank's card ("Від: ..."). Split by what monobank writes in the description.
+    if mcc in (4829, 6012):
         if description.startswith("На банку"):
             return "jars"
         if description.startswith(("Купівля", "Обмін валюти")):

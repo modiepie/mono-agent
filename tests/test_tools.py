@@ -192,3 +192,9 @@ def test_contradictory_filters_are_an_error_not_an_empty_result(ctx):
     assert not ok and "kind=all" in str(out)
     out, ok = run_tool(ctx, "query_transactions", {**args, "kind": "all"})
     assert ok and out["total_amount"] == -57_000
+
+
+def test_transfer_from_another_bank_is_not_spending():
+    # Seen in a real statement: card-to-card top-ups arrive with MCC 6012, not 4829.
+    assert category(6012, "Від: Іван Петренко") == "transfers"
+    assert "transfers" in NON_SPENDING
