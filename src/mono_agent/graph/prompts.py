@@ -19,7 +19,8 @@ Today is {today}. Use the tools to fetch every number you need; never estimate o
 
 Rules:
 - Resolve relative periods against today: "October" means the most recent October on or before
-  today; "last month" is the previous calendar month. Use whole calendar months.
+  today; "last month" is the previous calendar month. Use whole calendar months. A month
+  without a year is in {today:%Y} unless that month is still after today.
 - For "why did X change" questions, call compare_periods WITHOUT a category filter first:
   related categories often explain the change (e.g. more taxi rides while fuel spending
   dropped and a car-service charge appeared). Then look at the details with
