@@ -74,7 +74,10 @@ class Settings(BaseSettings):
 
     @property
     def checkpoint_db(self) -> Path:
-        return self.data_dir / "checkpoints.sqlite"
+        # Per mode too: a demo conversation must not continue on real data, or the reverse.
+        return self.data_dir / (
+            "checkpoints-real.sqlite" if self.use_real_api else "checkpoints.sqlite"
+        )
 
 
 def get_settings() -> Settings:

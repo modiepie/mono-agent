@@ -141,7 +141,9 @@ Open http://localhost:8501. The first start downloads the embedding and reranker
 - **Your real account:** put your token from [api.monobank.ua](https://api.monobank.ua/) in
   `MONO_TOKEN` in `.env`. Card numbers and IBANs are masked before storage; data stays on your
   machine as long as the models are local. Syncing a year takes about 12 minutes the first time
-  (the API allows one statement call per minute); after that it's cached.
+  (the API allows one statement call per minute); after that it's cached. Real and demo data
+  never mix: each mode has its own cache and conversation files in `data/`, so clearing
+  `MONO_TOKEN` brings the synthetic demo back untouched.
 - **Other models:** set `ROUTER_MODEL`, `AGENT_MODEL`, `COMPOSER_MODEL`, `FALLBACK_MODEL` to any
   `provider:model` (e.g. `anthropic:claude-sonnet-5-5`, `openrouter:...`) and the matching key.
 
